@@ -16,4 +16,4 @@
 
 ## Conflict Plan
 
-* https://github.com/KlNGU/restaurant-roulette/blob/development/conflict-plan.md
+[Click Here to See Conflict Plan!](https://github.com/KlNGU/restaurant-roulette/blob/development/conflict-plan.md)
