@@ -2,14 +2,14 @@
 
 ## User Stories
 
-1.As a user I want this app usable on my phone.
+1. As a user I want this app usable on my phone.
 
-2.As a user I want to see a restaurant near me.
+2. As a user I want to see the restaurant that are near me.
 
-3.As a user I would like to see a picture of the restaurant/menu.
+3. As a user I would like to see a picture of the restaurant/menu items.
 
-4.As a user I want get a different result if the first doesn't suit my needs.
+4. As a user I want get a different result if the first doesn't suit my taste.
 
-5.As a user I would like to save favorites and keep track of my preferences.
+5. As a user I would like to save favorites and keep track of my preferences.
 
-6.As a user I would like to choose the type of restaurants.
+6. As a user I would like to choose the type of restaurants.
