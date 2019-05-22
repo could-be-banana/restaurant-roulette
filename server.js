@@ -27,5 +27,11 @@ app.use(method(function (request) {
   }
 }));
 
+//Database Setup
+const client = new pg.Client(process.env.DATABASE_URL)
+client.connect()
+client.on('error', err => console.error(err))
+
+
 //Setthe view engine for server-side templating
 app.set('view engine', 'ejs');
