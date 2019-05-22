@@ -1,5 +1,23 @@
 # restaurant-roulette
 
+## Version
+
+1.0.0
+
+## Team Members
+
+* Brandyn Vay
+
+* Aileen Murphy
+
+* Richard Von Hagel
+
+* Meron Sibani
+
+## Project Description
+
+## Problem Domain
+
 ## User Stories
 
 1. As a user I want this app usable on my phone.
@@ -13,6 +31,22 @@
 5. As a user I would like to save favorites and keep track of my preferences.
 
 6. As a user I would like to choose the type of restaurants.
+
+## Architecture
+
+* libraries:
+
+* Frameworks:
+
+* Packages:
+
+## User Instructions
+
+## API Endpoints
+
+## Database Schemas
+
+* add links using [name here](website here)
 
 ## Conflict Plan
 
