@@ -14,6 +14,10 @@
 
 * Meron Sibani
 
+## Project Scope
+
+[Click Here to See Project Scope](https://github.com/KlNGU/restaurant-roulette/blob/development/project-scope.md)
+
 ## Project Description
 
 ## Problem Domain
