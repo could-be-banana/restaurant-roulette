@@ -13,3 +13,7 @@
 5. As a user I would like to save favorites and keep track of my preferences.
 
 6. As a user I would like to choose the type of restaurants.
+
+## Conflict Plan
+
+* https://github.com/KlNGU/restaurant-roulette/blob/development/conflict-plan.md
