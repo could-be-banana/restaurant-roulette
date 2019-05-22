@@ -29,3 +29,6 @@ app.use(method(function (request) {
 
 //Setthe view engine for server-side templating
 app.set('view engine', 'ejs');
+
+
+client.on('err', err => console.error(err));
