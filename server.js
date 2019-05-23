@@ -23,12 +23,23 @@ app.use(method(function (request) {
   if (request.body && typeof request.body === 'object' && '_method' in request.body) {
     let method = request.body._method;
     delete request.body._method;
-    return method
+    return method;
   }
 }));
 
-//Setthe view engine for server-side templating
+//Set the view engine for server-side templating
 app.set('view engine', 'ejs');
 
+// ERROR HANDLER
+function handleError(err, res) {
+  console.error(err);
+  if (res) res.status(500).send('Sorry, something went wrong');
+}
 
+//Endpoints
+app.post('/home', newSearch);
+app.post('add-to-databse', addShop);
+
+
+//Database client on error
 client.on('err', err => console.error(err));
