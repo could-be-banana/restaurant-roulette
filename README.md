@@ -53,11 +53,11 @@
 
 ## Architecture
 
-* libraries:
+* libraries: Node.js, jquery, javascript, and HTML & CSS
 
-* Frameworks:
+* Frameworks: Ajax, Javascript, and heroku
 
-* Packages:
+* Packages: express, superagent, pg, and method-override
 
 ## User Instructions
 
