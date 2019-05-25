@@ -7,11 +7,7 @@ function myFunction() {
   } else {
     menu.className = "nav";
   }
-}
-
-
-
-
+};
 
   $('form').hide();
   $('.show-form').on('click', function(e) {
