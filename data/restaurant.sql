@@ -21,7 +21,6 @@ CREATE TABLE restaurants (
   weekday_text VARCHAR(255),
   price_level VARCHAR(255),
   rating VARCHAR(255)
-  
 );
   
 
@@ -31,6 +30,4 @@ CREATE TABLE favorites (
   FOREIGN KEY (user_id) REFERENCES users (id),
   restaurants_id INTEGER NOT NULL,
   FOREIGN KEY (restaurants_id) REFERENCES restaurants (id)
-  
-  
 );
