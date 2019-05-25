@@ -1,1 +1,76 @@
 <!-- Mary -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+</head>
+<body>
+  <%- include('../partials/header') %>
+  <section class="detail">
+   
+ <main>
+   
+     
+<section class="detail">
+  <img src=<%=locations.image_url %>>
+  <h3><%= locations.name %></h3>
+  <h4><%= locations.lat %></h4>
+  <h4><%= locations.lat %></h4>
+  <p><%= locations.formatted_address %></p>
+  <button class="show-form">Update details</button>
+ 
+
+   </section>
+   
+<section class="detail-form">
+
+    <form action="/locations/<%=locations.id %>" method="post">
+      <input type="hidden" name="_method" value="PUT">
+  
+  
+      <input name="name" class="text-input"  name="search" value="<%= locations.name %>" required>
+      <input name="latitude" class="text-input"  name="search" value="<%= locations.lng %>" required>
+      <input name="longtiude" class="text-input"  name="search" value="<%= locations.isbn %>" required>
+      <input name="image_url" class="text-input"  name="search" value="<%= locations.image_url %>" required>
+      <textarea name="description" class="text-input"  cols="30" rows="10" required><%= locations.description %></textarea>
+      <input name="bookshelf" class="text-input"  name="search" placeholder="Enter restaurant name" required>
+      <button id="add-form-submit" type="submit">Add to Database</button>
+    </form>
+
+    <form action="/locations/<%=locations.id %>" method="post">
+      <input type="hidden" name="_method" value="DELETE">
+      <input type="submit" value="Remove from locations">
+    </form>
+  </section>
+</main>
+</body>
+</html>
+  
+  
+  
+  
+  
+  
+  
+  
+    
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+        
+        
+
+
+

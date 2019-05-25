@@ -32,9 +32,36 @@ app.use(method(function (request) {
 app.set('view engine', 'ejs');
 
 
+//connection Test
+app.get('/', home);
+
+function home(req, res){
+
+  let SQL = 'SELECT * FROM locations';
+  return client.query(SQL)
+  .then(data => {
+    res.render('pages/details.ejs', {locations: data.rows});
+  })
+  .catch(err => {
+    console.log(err);
+    res.render('pages/error', {err});
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
 //Endpoints
-app.post('/home', searchToLatLong);
-app.post('add-to-databse', addShop);
+//app.post('/home', searchToLatLong);
+//app.post('add-to-databse', addShop);
 
 // ERROR HANDLER
 function handleError(err, res) {
@@ -131,3 +158,9 @@ function Location (query, location) {
   this.latitude = location.geometry.location.lat;
   this.longitude = location.geometry.location.lng;
 }
+
+
+
+// Localhost listener
+
+app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
