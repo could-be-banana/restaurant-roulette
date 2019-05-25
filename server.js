@@ -35,9 +35,12 @@ app.set('view engine', 'ejs');
 
 //Endpoints
 app.post('/create-search', searchGeocode);
-app.post('/shop-favorites', showFavs);
-app.post('/shop-details/:shop_id', showShopDetails);
-app.post('/add-to-databse', addShop);
+// app.post('/shop-favorites', showFavs);
+// app.post('/shop-details/:shop_id', showShopDetails);
+// app.post('/add-to-databse', addShop);
+
+// app.delete('/delete-favorite/:shop_id', deleteFav);
+
 
 app.delete('/delete-favorite/:shop_id', deleteFav);
 
@@ -72,7 +75,12 @@ function getDataFromDB(sqlInfo) {
   catch (error) { handleError(error); }
 }
 
+<<<<<<< HEAD
 function saveDataToDB(sqlInfo) {
+=======
+
+function saveDataToDB (sqlInfo) {
+>>>>>>> 60d2818b94b6ab1c5c1cadad4630d319eb5265ac
   // Create the parameter placeholders
   let params = [];
 
