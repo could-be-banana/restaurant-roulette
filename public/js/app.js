@@ -12,21 +12,18 @@ function myFunction() {
 
 
 
-$(document).ready(function() {
-	$("body").on('click', '.top', function() {
-		$("nav.menu").toggleClass("menu_show");
-  });
+
   $('form').hide();
   $('.show-form').on('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
-    let showSingleForm = "." + $(this).val();
+    let showform = "." + $(this).val();
     console.log($(e.target).parent());
     $(this).hide();
-    if(showSingleForm === "."){
+    if(showform === "."){
       $('form').show()
     } else {
-      $(`${showSingleForm}`).show();
+      $(`${shmowSingleFor}`).show();
     }
   });
 
