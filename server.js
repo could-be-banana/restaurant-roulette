@@ -15,6 +15,7 @@ const PORT = process.env.PORT;
 const client = new pg.Client(process.env.DATABASE_URL);
 client.connect();
 client.on('err', err => console.error(err));
+app.listen(PORT, () => console.log(`Its alive ${PORT}`));
 
 //Application Middleware
 app.use(express.urlencoded({ extended: true}));
@@ -33,10 +34,12 @@ app.set('view engine', 'ejs');
 
 
 //Endpoints
-app.post('/', showFavs);
-app.post('/create-search', searchToLatLong);
-app.post('/new-search', newSearch)
+app.post('/create-search', searchGeocode);
+app.post('/shop-favorites', showFavs);
+app.post('/shop-details/:shop_id', showShopDetails);
 app.post('/add-to-databse', addShop);
+
+app.delete('/delete-favorite/:shop_id', deleteFav);
 
 // Catch-all
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
@@ -47,58 +50,57 @@ function handleError(err, res) {
   if (res) res.status(500).send('Sorry, something went wrong');
 }
 
-function getDataFromDB (sqlInfo) {
+// HELPER FUNCTIONS
+
+function getDataFromDB(sqlInfo) {
+  // Create a SQL Statement
   let condition = '';
   let values = [];
 
-  if (sqlInfo.searchquery) {
+  if (sqlInfo.searchQuery) {
     condition = 'search_query';
-     values = [sqlInfo.searchQuery];
+    values = [sqlInfo.searchQuery];
   } else {
     condition = 'location_id';
     values = [sqlInfo.id];
   }
 
-  let sql = `SELECT * FROM ${sqlInfo.endpoint}s WHERE ${condition}=$1`;
+  let sql = `SELECT * FROM ${sqlInfo.endpoint}s WHERE ${condition}=$1;`;
 
-  //Get the Data and Return it
-  try {
-    return client.query(sql, values);
-  }
-  catch (err) {
-    handleError(err);
-  }
+  // Get the Data and Return
+  try { return client.query(sql, values); }
+  catch (error) { handleError(error); }
 }
 
-function saveDataToDB (sqlInfo) {
+function saveDataToDB(sqlInfo) {
+  // Create the parameter placeholders
   let params = [];
 
-  for ( let i = 1; i <= sqlInfo.values.lenfgth; i++) {
+  for (let i = 1; i <= sqlInfo.values.length; i++) {
     params.push(`$${i}`);
   }
 
   let sqlParams = params.join();
 
   let sql = '';
-  if (sqlInfo.searchquery) {
-    sql = `INSERT INTO  ${sqlInfo.endpoint}s (${sqlInfo.columns}) VALUES (${sqlParams}) RETURNING ID;`;
+  if (sqlInfo.searchQuery) {
+    // location
+    sql = `INSERT INTO ${sqlInfo.endpoint}s (${sqlInfo.columns}) VALUES (${sqlParams}) RETURNING ID;`;
   } else {
-    sql = `INSER INTO ${sqlInfo.endpoint}s (${sqlInfo.columns}) VALUES (${sqlParams});`;
+    // all other endpoints
+    sql = `INSERT INTO ${sqlInfo.endpoint}s (${sqlInfo.columns}) VALUES (${sqlParams});`;
   }
 
-  try {
-    return client.query(sql, sqlInfo.values);
-  }
-  catch (err) {
-    handleError(err);
-  }
+  // save the data
+  try { return client.query(sql, sqlInfo.values); }
+  catch (err) { handleError(err); }
 }
 
-function searchToLatLong (request, response) {
+function searchGeocode (request, response) {
   let sqlInfo = {
     searchQuery: request.query.data,
     endpoint: 'location'
-  }
+  };
 
   getDataFromDB(sqlInfo)
     .then(result => {
@@ -109,10 +111,9 @@ function searchToLatLong (request, response) {
 
         superagent.get(url)
           .then(result => {
-            if (!result.body.results.length) {
-              throw 'NO LOCATION DATA';
-            } else {
-              let location = new Location (sqlInfo.searchQuery, result.body.results[0]);
+            if (!result.body.results.length) { throw 'NO LOCATION DATA'; }
+            else {
+              let location = new Location(sqlInfo.searchQuery, result.body.results[0]);
 
               sqlInfo.columns = Object.keys(location).join();
               sqlInfo.values = Object.values(location);
@@ -124,7 +125,7 @@ function searchToLatLong (request, response) {
                 });
             }
           })
-          .catch(err => handleError(err, response));
+          .catch(error => handleError(error, response));
       }
     });
 }
