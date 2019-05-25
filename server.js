@@ -32,18 +32,16 @@ app.use(method(function (request) {
 //Set the view engine for server-side templating
 app.set('view engine', 'ejs');
 
+//Proof of life for heroku
+app.get('/', (request, response) => response.send("Proof of Life"));
 
 //Endpoints
-app.get('/', (request, response) => response.send("Proof of Life"));
 app.post('/create-search', searchGeocode);
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/add-to-databse', addShop);
 
 app.delete('/delete-favorite/:shop_id', deleteFav);
-
-// Catch-all
-app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 // ERROR HANDLER
 function handleError(err, res) {
@@ -53,6 +51,7 @@ function handleError(err, res) {
 
 // HELPER FUNCTIONS
 
+//Gets info from DB
 function getDataFromDB(sqlInfo) {
   // Create a SQL Statement
   let condition = '';
@@ -73,6 +72,7 @@ function getDataFromDB(sqlInfo) {
   catch (error) { handleError(error); }
 }
 
+//Saves to DB
 function saveDataToDB(sqlInfo) {
   // Create the parameter placeholders
   let params = [];
