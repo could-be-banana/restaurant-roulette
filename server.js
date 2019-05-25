@@ -97,6 +97,7 @@ function saveDataToDB(sqlInfo) {
   catch (err) { handleError(err); }
 }
 
+//Searches geocode API 
 function searchGeocode (request, response) {
   let sqlInfo = {
     searchQuery: request.query.data,
