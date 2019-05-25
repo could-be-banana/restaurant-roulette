@@ -33,8 +33,13 @@ app.set('view engine', 'ejs');
 
 
 //Endpoints
-app.post('/home', searchToLatLong);
-app.post('add-to-databse', addShop);
+app.post('/', showFavs);
+app.post('/create-search', searchToLatLong);
+app.post('/new-search', newSearch)
+app.post('/add-to-databse', addShop);
+
+// Catch-all
+app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 // ERROR HANDLER
 function handleError(err, res) {
@@ -65,7 +70,7 @@ function getDataFromDB (sqlInfo) {
   }
 }
 
-function savaDataToDB (sqlInfo) {
+function saveDataToDB (sqlInfo) {
   let params = [];
 
   for ( let i = 1; i <= sqlInfo.values.lenfgth; i++) {
