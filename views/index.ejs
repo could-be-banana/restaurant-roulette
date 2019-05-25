@@ -1,0 +1,70 @@
+<!-- Aileen -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%- include('partials/head.ejs') %>
+  <!--   
+  <title>Restaurant Roulette!</title>
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="/public/styles/reset.css">
+  <link rel="stylesheet" href="/public/styles/base.css">
+  <link rel="stylesheet" href="/public/styles/layout.css">
+  <link rel="stylesheet" href="/public/styles/modules.css"> -->
+
+
+</head>
+
+<body>
+  <header>
+    <%- include('partials/header.ejs') %>
+    <!-- 
+<nav class="nav" id="topNav">
+    <a href="/" class="menu">RESTAURANT ROULETTE</a>
+    <a href="../pages/how-to.ejs">About the App</a>
+    <a href="/">Spin the Wheel!!</a>
+    <a href="../pages/favorites">Your Jackpot Eats</a>
+    <a href="#badeats">Hot Garbage</a>
+    <a href="../pages/about-us.ejs">About Us</a>
+    <a href="javascript:void(0);" class="icon" onclick="myFunction()"><i class="fas fa-hamburger"></i></a>
+  </nav> -->
+
+  </header>
+  <main>
+    <div id="roulette"></div>
+
+    <div class="controls">
+      <p>Don't know what to eat? Send burrito-cat your location and budget and let her do the work!</p>
+      <p>Location here:</p>
+      <input type="text" placeholder="set location here" required></input>
+
+      <p>name your price!</p>
+      <form action="/searches" method="post">
+        <input list="budget" name="budget">
+        <datalist id="budget">
+          <option value="$">
+          <option value="$-$$">
+          <option value="$$-$$$">
+          <option value="$$$-$$$$">
+        </datalist>
+        <input type="submit">
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <%- include('partials/footer.ejs') %>
+    <!-- 
+<h3>&copy;CouldBeBanana 2019. All rights reserved.</h3>
+
+
+<script src="https://code.jquery.com/jquery.min.js"></script>
+<script src="/public/js/app.js"></script> -->
+  </footer>
+</body>
+
+</html>

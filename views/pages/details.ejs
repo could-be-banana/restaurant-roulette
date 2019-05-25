@@ -1,0 +1,23 @@
+<!-- Maron -->
+<section class="detail">
+  <section class="detail">
+    <h2><%= locations.name %> </h2>
+    <img src=<%=locations.image_url %>>
+    <p><%= locations.image_url %></p>
+    <p><%= locations.lat %></p>
+    <p><%= locations.lat %></p>
+    <p><%= locations.formatted_address %></p>
+    <button class="show-form">Update details</button>
+  </section>
+
+  <section class="detail-form">
+  
+      <form action="/locations/<%=locations.id %>" method="post">
+        <input type="hidden" name="_method" value="PUT">
+        <input name="name" class="text-input"  name="search" value="<%= locations.name %>" >
+        <input name="latitude" class="text-input"  name="search" value="<%= locations.lat %>" >
+        <input name="longtiude" class="text-input"  name="search" value="<%= locations.lng %>" >
+        <input name="image_url" class="text-input"  name="search" value="<%= locations.image_url %>" >
+        <button id="add-form-submit" type="submit">Add to Database</button>
+      </form>
+  </section>
