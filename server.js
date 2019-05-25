@@ -75,12 +75,7 @@ function getDataFromDB(sqlInfo) {
   catch (error) { handleError(error); }
 }
 
-<<<<<<< HEAD
 function saveDataToDB(sqlInfo) {
-=======
-
-function saveDataToDB (sqlInfo) {
->>>>>>> 60d2818b94b6ab1c5c1cadad4630d319eb5265ac
   // Create the parameter placeholders
   let params = [];
 
