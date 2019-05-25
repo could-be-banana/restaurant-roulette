@@ -34,13 +34,11 @@ app.set('view engine', 'ejs');
 
 
 //Endpoints
+app.get('/', (request, response) => response.send("Proof of Life"));
 app.post('/create-search', searchGeocode);
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/add-to-databse', addShop);
-
-// app.delete('/delete-favorite/:shop_id', deleteFav);
-
 
 app.delete('/delete-favorite/:shop_id', deleteFav);
 
@@ -131,6 +129,15 @@ function searchGeocode (request, response) {
           .catch(error => handleError(error, response));
       }
     });
+}
+
+//Deletes restaurant from DB
+function deleteFav (request, response) {
+  const SQL = 'DELETE FROM favorites WHERE id=$1;';
+  const value = [request.params.place_id];
+  client.query (SQL, value)
+    .then(response.redirect('/shop-favorites'))
+    .catch(err => handleError(err, response));
 }
 
 //Constructor Functions
