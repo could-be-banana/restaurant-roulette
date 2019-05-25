@@ -33,10 +33,12 @@ app.set('view engine', 'ejs');
 
 
 //Endpoints
-app.post('/', showFavs);
-app.post('/create-search', searchToLatLong);
-app.post('/new-search', newSearch)
-app.post('/add-to-databse', addShop);
+app.post('/create-search', searchGeocode);
+// app.post('/shop-favorites', showFavs);
+// app.post('/shop-details/:shop_id', showShopDetails);
+// app.post('/add-to-databse', addShop);
+
+// app.delete('/delete-favorite/:shop_id', deleteFav);
 
 // Catch-all
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
@@ -70,7 +72,9 @@ function getDataFromDB (sqlInfo) {
   }
 }
 
+
 function saveDataToDB (sqlInfo) {
+  // Create the parameter placeholders
   let params = [];
 
   for ( let i = 1; i <= sqlInfo.values.lenfgth; i++) {
@@ -94,7 +98,7 @@ function saveDataToDB (sqlInfo) {
   }
 }
 
-function searchToLatLong (request, response) {
+function searchGeocode (request, response) {
   let sqlInfo = {
     searchQuery: request.query.data,
     endpoint: 'location'
