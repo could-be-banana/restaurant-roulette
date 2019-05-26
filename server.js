@@ -33,15 +33,15 @@ app.use(method(function (request) {
 app.set('view engine', 'ejs');
 
 //Proof of life for heroku
-app.get('/', (request, response) => response.send("Proof of Life"));
+// app.get('/', (request, response) => response.send("Proof of Life"));
 
 //Endpoints
-app.post('/create-search', searchGeocode);
+app.post('/searches', searchGeocode);
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/add-to-databse', addShop);
 
-app.delete('/delete-favorite/:shop_id', deleteFav);
+app.delete('/delete-favorite/:place_id', deleteFav);
 
 // ERROR HANDLER
 function handleError(err, res) {
@@ -104,13 +104,15 @@ function searchGeocode (request, response) {
     endpoint: 'location'
   };
 
+  
   getDataFromDB(sqlInfo)
-    .then(result => {
-      if (result.rowCount > 0) {
-        response.send(result.rows[0]);
-      } else {
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
-
+  .then(result => {
+    if (result.rowCount > 0) {
+      response.send(result.rows[0]);
+    } else {
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
+      
+      console.log(url);
         superagent.get(url)
           .then(result => {
             if (!result.body.results.length) { throw 'NO LOCATION DATA'; }
