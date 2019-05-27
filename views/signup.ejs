@@ -1,0 +1,13 @@
+
+<%- include('partials/header.ejs') %>
+<body>
+  <h1><%= users.username %></h1>
+  <form action="signup" method="post">
+    <lable>Ussername</lable>
+    <input type="text" class="form-control" name="Username">
+    <button type="submit" class="btn btn-warning btn-lg">Signup</button> 
+  </form>
+
+
+  <p>Already user created ? <a href="/login">Login</a></p>
+  <p>or go<a href="/login">Login</a></p>

@@ -1,12 +1,12 @@
 -- Schema for restaurant_app
 
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS restaurants;
-DROP TABLE IF EXISTS favorites;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS restaurants CASCADE;
+DROP TABLE IF EXISTS favorites CASCADE;
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(255)
+  username VARCHAR(255) UNIQUE NOT NULL,
 );
  
 
@@ -31,3 +31,12 @@ CREATE TABLE favorites (
   restaurants_id INTEGER NOT NULL,
   FOREIGN KEY (restaurants_id) REFERENCES restaurants (id)
 );
+
+
+
+
+INSERT INTO users (username) value('meron')
+
+SELECT * from users;
+
+

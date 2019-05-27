@@ -5,6 +5,7 @@ require('dotenv').config();
 
 //Application Dependencies
 const express = require('express');
+const bodyParser = require('body-parser')
 const superagent = require('superagent');
 const pg = require('pg');
 const method = require('method-override');
@@ -32,9 +33,12 @@ app.use(method(function (request) {
 //Set the view engine for server-side templating
 app.set('view engine', 'ejs');
 
-
 //Endpoints
+app.get('/', login)
+app.get('/signup', signUp)
+app.post( '/users',  createUser)
 app.post('/create-search', searchGeocode);
+
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/add-to-databse', addShop);
@@ -42,16 +46,79 @@ app.post('/create-search', searchGeocode);
 // app.delete('/delete-favorite/:shop_id', deleteFav);
 
 
-app.delete('/delete-favorite/:shop_id', deleteFav);
+// app.delete('/delete-favorite/:shop_id', deleteFav);
+function login(req, res){
+  let SQL = 'SELECT * FROM users';
+  
+  if (!res.username) {
+    return client.query(SQL)
+  
+  .then(data => {
+    res.render('login', {users: data.rows});
+  })
+  .catch(err => {
+    console.log(err);
+    res.render('/error', {err});
+  });
+}
+}
+
+function  createUser (req, res){
+  const {username} = req.body
+  let SQL = (`INSERT INTO users (username) VALUES ($1);`);
+  let values = (SQL, [req.body.username]);
+  return client.query(SQL, values)
+    .then(result => {
+      let SQL = 'SELECT id FROM users Where username=$1;rs';
+      let values = [req.body.username];
+
+      return client.query(SQL,values)
+        .then(result =>{
+          res.redirect(`/login/${result.rows[0].id}`);
+        })
+
+        .catch(err => handleError(err, res));
+    })
+    .catch(err => handleError(err,res));
+  }
+
+
+
+
+
+ 
+
+function signUp(request, response) {
+  response.render('signUp.ejs', {users: request.flash('signUpUsers')})
+};
+
+
+
 
 // Catch-all
-app.get('*', (request, response) => response.status(404).send('This route does not exist'));
+//app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 // ERROR HANDLER
 function handleError(err, res) {
   console.error(err);
   if (res) res.status(500).send('Sorry, something went wrong');
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // HELPER FUNCTIONS
 
@@ -140,3 +207,7 @@ function Location (query, location) {
   this.latitude = location.geometry.location.lat;
   this.longitude = location.geometry.location.lng;
 }
+
+
+// Catch-all
+app.get('*', (request, response) => response.status(404).send('This route does not exist'));
