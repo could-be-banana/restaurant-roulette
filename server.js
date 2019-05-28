@@ -16,6 +16,8 @@ const PORT = process.env.PORT;
 const client = new pg.Client(process.env.DATABASE_URL);
 client.connect();
 client.on('err', err => console.error(err));
+
+//Server is listening
 app.listen(PORT, () => console.log(`Its alive ${PORT}`));
 
 //Application Middleware
@@ -30,6 +32,12 @@ app.use(method(function (request) {
   }
 }));
 
+// ERROR HANDLER
+function handleError(err, res) {
+  console.error(err);
+  if (res) res.status(500).send('Sorry, something went wrong');
+}
+
 //Set the view engine for server-side templating
 app.set('view engine', 'ejs');
 
@@ -38,15 +46,12 @@ app.get('/', login)
 app.get('/signup', signUp)
 app.post( '/users',  createUser)
 app.post('/create-search', searchGeocode);
-
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/add-to-databse', addShop);
 
-// app.delete('/delete-favorite/:shop_id', deleteFav);
+app.delete('/delete-favorite/:shop_id', deleteFav);
 
-
-// app.delete('/delete-favorite/:shop_id', deleteFav);
 function login(req, res){
   let SQL = 'SELECT * FROM users';
   
@@ -82,46 +87,13 @@ function  createUser (req, res){
     .catch(err => handleError(err,res));
   }
 
-
-
-
-
- 
-
 function signUp(request, response) {
   response.render('signUp.ejs', {users: request.flash('signUpUsers')})
 };
 
-
-
-
-// Catch-all
-//app.get('*', (request, response) => response.status(404).send('This route does not exist'));
-
-// ERROR HANDLER
-function handleError(err, res) {
-  console.error(err);
-  if (res) res.status(500).send('Sorry, something went wrong');
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // HELPER FUNCTIONS
 
+//Gets info from DB
 function getDataFromDB(sqlInfo) {
   // Create a SQL Statement
   let condition = '';
@@ -142,6 +114,7 @@ function getDataFromDB(sqlInfo) {
   catch (error) { handleError(error); }
 }
 
+//Saves to DB
 function saveDataToDB(sqlInfo) {
   // Create the parameter placeholders
   let params = [];
@@ -166,19 +139,22 @@ function saveDataToDB(sqlInfo) {
   catch (err) { handleError(err); }
 }
 
+//Searches geocode API 
 function searchGeocode (request, response) {
   let sqlInfo = {
     searchQuery: request.query.data,
     endpoint: 'location'
   };
 
+  
   getDataFromDB(sqlInfo)
-    .then(result => {
-      if (result.rowCount > 0) {
-        response.send(result.rows[0]);
-      } else {
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
-
+  .then(result => {
+    if (result.rowCount > 0) {
+      response.send(result.rows[0]);
+    } else {
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
+      
+      console.log(url);
         superagent.get(url)
           .then(result => {
             if (!result.body.results.length) { throw 'NO LOCATION DATA'; }
@@ -198,6 +174,15 @@ function searchGeocode (request, response) {
           .catch(error => handleError(error, response));
       }
     });
+}
+
+//Deletes restaurant from DB
+function deleteFav (request, response) {
+  const SQL = 'DELETE FROM favorites WHERE id=$1;';
+  const value = [request.params.place_id];
+  client.query (SQL, value)
+    .then(response.redirect('/shop-favorites'))
+    .catch(err => handleError(err, response));
 }
 
 //Constructor Functions
