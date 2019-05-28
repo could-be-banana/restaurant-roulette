@@ -1,36 +1,41 @@
 'use strict';
 
-//PROVIDE ACCESS TO ENVIROMENT VARIABLES IN .env
+// envir variables
 require('dotenv').config();
 
-//Application Dependencies
+// app dependencies
 const express = require('express');
 const bodyParser = require('body-parser')
 const superagent = require('superagent');
 const pg = require('pg');
+const ejs = require('ejs');
 const method = require('method-override');
+
 
 //Application Setup
 const app = express();
 const PORT = process.env.PORT;
 const client = new pg.Client(process.env.DATABASE_URL);
+
+
 client.connect();
 client.on('err', err => console.error(err));
 
-//Server is listening
-app.listen(PORT, () => console.log(`Its alive ${PORT}`));
+// listen!
+app.listen(PORT, () => console.log(`Loud and clear on ${PORT}`));
 
-//Application Middleware
-app.use(express.urlencoded({ extended: true}));
+// Application Middleware
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-app.use(method(function (request) {
-  if (request.body && typeof request.body === 'object' && '_method' in request.body) {
-    let method = request.body._method;
-    delete request.body._method;
-    return method;
-  }
-}));
+
+// ejs!
+app.set('view engine', 'ejs');
+
+// API Routes
+// Renders the search form
+app.get('/', spinTheWheel);
+app.post('/placeSearch', getGeocode);
 
 // ERROR HANDLER
 function handleError(err, res) {
@@ -42,15 +47,18 @@ function handleError(err, res) {
 app.set('view engine', 'ejs');
 
 //Endpoints
-app.get('/', login)
-app.get('/signup', signUp)
-app.post( '/users',  createUser)
-app.post('/create-search', searchGeocode);
+// app.get('/', login)
+// app.get('/signup', signUp)
+// app.post( '/users',  createUser)
+// app.post('/create-search', searchGeocode);
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/add-to-databse', addShop);
 
-app.delete('/delete-favorite/:shop_id', deleteFav);
+
+app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
+
+
 
 function login(req, res){
   let SQL = 'SELECT * FROM users';
@@ -67,6 +75,7 @@ function login(req, res){
   });
 }
 }
+
 
 function  createUser (req, res){
   const {username} = req.body
@@ -93,104 +102,93 @@ function signUp(request, response) {
 
 // HELPER FUNCTIONS
 
-//Gets info from DB
-function getDataFromDB(sqlInfo) {
-  // Create a SQL Statement
-  let condition = '';
-  let values = [];
 
-  if (sqlInfo.searchQuery) {
-    condition = 'search_query';
-    values = [sqlInfo.searchQuery];
-  } else {
-    condition = 'location_id';
-    values = [sqlInfo.id];
-  }
 
-  let sql = `SELECT * FROM ${sqlInfo.endpoint}s WHERE ${condition}=$1;`;
-
-  // Get the Data and Return
-  try { return client.query(sql, values); }
-  catch (error) { handleError(error); }
+// landing page... going to change
+function spinTheWheel(request, response) {
+  response.render('index');
 }
 
-//Saves to DB
-function saveDataToDB(sqlInfo) {
-  // Create the parameter placeholders
-  let params = [];
 
-  for (let i = 1; i <= sqlInfo.values.length; i++) {
-    params.push(`$${i}`);
-  }
 
-  let sqlParams = params.join();
 
-  let sql = '';
-  if (sqlInfo.searchQuery) {
-    // location
-    sql = `INSERT INTO ${sqlInfo.endpoint}s (${sqlInfo.columns}) VALUES (${sqlParams}) RETURNING ID;`;
-  } else {
-    // all other endpoints
-    sql = `INSERT INTO ${sqlInfo.endpoint}s (${sqlInfo.columns}) VALUES (${sqlParams});`;
-  }
+function getGeocode(request, response) {
 
-  // save the data
-  try { return client.query(sql, sqlInfo.values); }
-  catch (err) { handleError(err); }
-}
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body[0]}&key=${process.env.GOOGLE_API_KEY}`;
+  console.log(url);
 
-//Searches geocode API 
-function searchGeocode (request, response) {
-  let sqlInfo = {
-    searchQuery: request.query.data,
-    endpoint: 'location'
-  };
 
-  
-  getDataFromDB(sqlInfo)
-  .then(result => {
-    if (result.rowCount > 0) {
-      response.send(result.rows[0]);
-    } else {
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
-      
-      console.log(url);
-        superagent.get(url)
-          .then(result => {
-            if (!result.body.results.length) { throw 'NO LOCATION DATA'; }
-            else {
-              let location = new Location(sqlInfo.searchQuery, result.body.results[0]);
+  superagent.get(url)
+    .then(result => {
+      console.log(result.body.results[0]);
+      const location = new Location(request.body, result);
+      // response.send(location);
 
-              sqlInfo.columns = Object.keys(location).join();
-              sqlInfo.values = Object.values(location);
 
-              saveDataToDB(sqlInfo)
-                .then(data => {
-                  location.id = data.rows[0].id;
-                  response.send(location);
-                });
-            }
-          })
-          .catch(error => handleError(error, response));
-      }
-    });
-}
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=1600&type=restaurant&keyword=restaurant&key=${process.env.GOOGLE_API_KEY}`;
 
-//Deletes restaurant from DB
-function deleteFav (request, response) {
-  const SQL = 'DELETE FROM favorites WHERE id=$1;';
-  const value = [request.params.place_id];
-  client.query (SQL, value)
-    .then(response.redirect('/shop-favorites'))
+      console.log(nearbyurl);
+    })
     .catch(err => handleError(err, response));
 }
 
-//Constructor Functions
-function Location (query, location) {
+// geocode constructor
+function Location(query, res) {
   this.search_query = query;
-  this.formatted_query = location.formatted_address;
-  this.latitude = location.geometry.location.lat;
-  this.longitude = location.geometry.location.lng;
+  this.formatted_query = res.body.results[0].formatted_address;
+  this.latitude = res.body.results[0].geometry.location.lat;
+  this.longitude = res.body.results[0].geometry.location.lng;
+}
+
+// function getNearby(request, response) {
+//   // Define the url for nearby search
+//   const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${request.query.data.latitude}, ${request.query.data.longitude}&radius=1600&type=restaurant&keyword=restaurant&key=${process.env.GOOGLE_API_KEY}`;
+//   // console.log(url);
+
+//   superagent.get(url)
+//     .then(result => {
+//       // console.log(result.body);
+//       const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
+//       response.send(nearbyPlaces);
+//     })
+//     .catch(err => handleError(err, response));
+// }
+
+// function Place(nearby) {
+//   this.name = nearby.name;
+//   this.place_id = nearby.place_id;
+//   this.price = nearby.price_level;
+//   this.rating = nearby.rating;
+//   this.photo_ref = nearby.photos.photo_reference;
+// }
+
+// function getNearby(request, response) {
+//   // Define the url for nearby search
+//   const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.body.results.nearby.place_id}&fields=address_component,adr_address,alt_id,formatted_address,geometry,icon,id,name,permanently_closed,photo,place_id,plus_code,scope,type,url,utc_offset,vicinity,website,formatted_phone_number,price_level,rating,review,user_ratings_total,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
+//   // console.log(url);
+
+//   superagent.get(url)
+//     .then(result => {
+//       // console.log(result.body);
+//       const placeDetails = result.body.results.map(details => new Deets(details));
+//       response.send(placeDetails);
+//     })
+//     .catch(err => handleError(err, response));
+// }
+
+// function Place(nearby) {
+//   this.name = nearby.name;
+//   this.place_id = nearby.place_id;
+//   this.price = nearby.price_level;
+//   this.rating = nearby.rating;
+//   this.photo_ref = nearby.photos.photo_reference;
+// }
+
+
+// Error Handler
+function handleError(err, response) {
+  console.error(err);
+  if (response) response.status(500).send('Sorry something went wrong');
 }
 
 
