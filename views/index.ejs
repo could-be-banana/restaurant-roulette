@@ -44,6 +44,7 @@
 
       <p>name your price!</p>
       <form action="/searches" method="post">
+        <input type="text" name="search" placeholder="Enter Location Here" required>
         <input list="budget" name="budget">
         <datalist id="budget">
           <option value="$">
@@ -54,8 +55,8 @@
         <input type="submit">
       </form>
     </div>
+   
   </main>
-
   <footer>
     <%- include('partials/footer.ejs') %>
     <!-- 
@@ -68,3 +69,6 @@
 </body>
 
 </html>
+
+        
+        

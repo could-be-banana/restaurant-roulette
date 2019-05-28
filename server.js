@@ -5,6 +5,7 @@ require('dotenv').config();
 
 // app dependencies
 const express = require('express');
+const bodyParser = require('body-parser')
 const superagent = require('superagent');
 const pg = require('pg');
 const ejs = require('ejs');
@@ -16,12 +17,17 @@ const app = express();
 const PORT = process.env.PORT;
 const client = new pg.Client(process.env.DATABASE_URL);
 
+
+client.connect();
+client.on('err', err => console.error(err));
+
 // listen!
 app.listen(PORT, () => console.log(`Loud and clear on ${PORT}`));
 
 // Application Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
 
 // ejs!
 app.set('view engine', 'ejs');
@@ -31,11 +37,71 @@ app.set('view engine', 'ejs');
 app.get('/', spinTheWheel);
 app.post('/placeSearch', getGeocode);
 
+// ERROR HANDLER
+function handleError(err, res) {
+  console.error(err);
+  if (res) res.status(500).send('Sorry, something went wrong');
+}
+
+//Set the view engine for server-side templating
+app.set('view engine', 'ejs');
+
+//Endpoints
+// app.get('/', login)
+// app.get('/signup', signUp)
+// app.post( '/users',  createUser)
+// app.post('/create-search', searchGeocode);
+// app.post('/shop-favorites', showFavs);
+// app.post('/shop-details/:shop_id', showShopDetails);
+// app.post('/add-to-databse', addShop);
+
 
 app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
 
 
+
+function login(req, res){
+  let SQL = 'SELECT * FROM users';
+  
+  if (!res.username) {
+    return client.query(SQL)
+  
+  .then(data => {
+    res.render('login', {users: data.rows});
+  })
+  .catch(err => {
+    console.log(err);
+    res.render('/error', {err});
+  });
+}
+}
+
+
+function  createUser (req, res){
+  const {username} = req.body
+  let SQL = (`INSERT INTO users (username) VALUES ($1);`);
+  let values = (SQL, [req.body.username]);
+  return client.query(SQL, values)
+    .then(result => {
+      let SQL = 'SELECT id FROM users Where username=$1;rs';
+      let values = [req.body.username];
+
+      return client.query(SQL,values)
+        .then(result =>{
+          res.redirect(`/login/${result.rows[0].id}`);
+        })
+
+        .catch(err => handleError(err, res));
+    })
+    .catch(err => handleError(err,res));
+  }
+
+function signUp(request, response) {
+  response.render('signUp.ejs', {users: request.flash('signUpUsers')})
+};
+
 // HELPER FUNCTIONS
+
 
 
 // landing page... going to change
@@ -44,16 +110,20 @@ function spinTheWheel(request, response) {
 }
 
 
+
+
 function getGeocode(request, response) {
 
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body[0]}&key=${process.env.GOOGLE_API_KEY}`;
   console.log(url);
+
 
   superagent.get(url)
     .then(result => {
       console.log(result.body.results[0]);
       const location = new Location(request.body, result);
       // response.send(location);
+
 
       const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=1600&type=restaurant&keyword=restaurant&key=${process.env.GOOGLE_API_KEY}`;
 
@@ -120,3 +190,7 @@ function handleError(err, response) {
   console.error(err);
   if (response) response.status(500).send('Sorry something went wrong');
 }
+
+
+// Catch-all
+app.get('*', (request, response) => response.status(404).send('This route does not exist'));
