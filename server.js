@@ -5,11 +5,11 @@ require('dotenv').config();
 
 // app dependencies
 const express = require('express');
-const bodyParser = require('body-parser')
 const superagent = require('superagent');
 const pg = require('pg');
 const ejs = require('ejs');
 const method = require('method-override');
+
 
 
 //Application Setup
@@ -61,20 +61,25 @@ app.get('*', (request, response) => response.status(404).send('Nothing to see he
 
 
 function login(req, res){
-  let SQL = 'SELECT * FROM users';
-  
-  if (!res.username) {
-    return client.query(SQL)
-  
+  let SQL = 'SELECT * FROM users WHERE id=$1';
+  let values = [req.params.id];
+
+  return client.query(SQL, values)
   .then(data => {
-    res.render('login', {users: data.rows});
-  })
-  .catch(err => {
-    console.log(err);
-    res.render('/error', {err});
-  });
+    const user = data.rows[0];
+  if(user.length > 0) {
+      return res.render('login', {users: data.rows})
+
 }
+
+});
+
 }
+
+   
+  
+
+
 
 
 function  createUser (req, res){
