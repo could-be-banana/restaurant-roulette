@@ -1,9 +1,17 @@
-
-
-
-<%- include('partials/header.ejs') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Login</title>
+  <%- include('partials/head.ejs') %>
+</head>
 <body>
-  <h1><%= users.username %></h1>
+  <header>
+    <%- include('partials/header.ejs') %>
+  </header>
+    <h1><%= users.username %></h1>
   <form name="Login/<%= users.username %>" method="POST" >
     <lable>Username:</lable>
     <input type="text" name="username" value="<%- users.username %>"  class="form-control" placeholder= "Username:">
@@ -14,29 +22,5 @@
 
   <p>Already have an account? <a href="/signup>Signup</a></p>
   <p>or go <a href="/">Signup</a></p>
-  
-  
-  
- 
-
-      
-        
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </body>
+</html>
