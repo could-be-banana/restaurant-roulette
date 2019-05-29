@@ -29,12 +29,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 
+
+
+
 // ejs!
 app.set('view engine', 'ejs');
 
 // API Routes
 // Renders the search form
 app.get('/', spinTheWheel);
+app.get('/pages/about-us.ejs', aboutUs);
 app.post('/placeSearch', getGeocode);
 //Endpoints
 // app.get('/', login)
@@ -94,7 +98,12 @@ app.get('*', (request, response) => response.status(404).send('Nothing to see he
 // HELPER FUNCTIONS
 // landing page... going to change
 function spinTheWheel(request, response) {
-  response.render('index');
+  response.render('pages/index');
+}
+
+//Rendering About Us page
+function aboutUs (request, response) {
+  response.render('pages/about-us');
 }
 
 function getGeocode(request, response) {
