@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
   <title>Sign Up</title>
   <%- include('partials/head.ejs') %>
 </head>
@@ -11,14 +9,16 @@
   <header>
       <%- include('partials/nav.ejs') %>
   </header>
-  <h1><%= users.username %></h1>
-  <form action="signup" method="post">
-    <lable>Ussername</lable>
-    <input type="text" class="form-control" name="Username">
-    <button type="submit" class="btn btn-warning btn-lg">Signup</button> 
-  </form>
-
-  <p>Already user created ? <a href="/login">Login</a></p>
-  <p>or go<a href="/login">Login</a></p>
+  <h1>Signup here</h1>
+  <div class="signup-container">
+    <form class="form-signup" action="/signup" method="post">
+      <input type="username" name="username" class="form-control" placeholder="username" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+  <div class="login-container">
+    <a href="/">Login</a>
+  </div>
+  
 </body>
 </html>

@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS favorites CASCADE;
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(255) UNIQUE NOT NULL,
+  username VARCHAR(50) UNIQUE NOT NULL
 );
  
 
@@ -35,8 +35,8 @@ CREATE TABLE favorites (
 
 
 
-INSERT INTO users (username) value('meron')
 
-SELECT * from users;
+
+
 
 

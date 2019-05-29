@@ -33,8 +33,14 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 // API Routes
+app.get('/', login);
+app.get('/login', show);
+app.post('/signup', addUser);
+app.post('/', allowIn);
+
+
 // Renders the search form
-app.get('/', spinTheWheel);
+//app.get('/', spinTheWheel);
 app.post('/placeSearch', getGeocode);
 
 // ERROR HANDLER
@@ -43,38 +49,78 @@ function handleError(err, res) {
   if (res) res.status(500).send('Sorry, something went wrong');
 }
 
-//Set the view engine for server-side templating
-app.set('view engine', 'ejs');
-
 //Endpoints
-// app.get('/', login)
-// app.get('/signup', signUp)
-// app.post( '/users',  createUser)
+
 // app.post('/create-search', searchGeocode);
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/add-to-databse', addShop);
 
 
-app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
+function addUser(request, response) {
+  console.log('done!', request.body);
 
+  let {username} = request.body;
+  username  = username.toLowerCase();
+  console.log('this is the user name:', username);
 
+  let userExist = 'SELECT * FROM users WHERE username = $1;';
 
-function login(req, res){
-  let SQL = 'SELECT * FROM users WHERE id=$1';
-  let values = [req.params.id];
+  let valuesOne = [username];
 
-  return client.query(SQL, values)
-  .then(data => {
-    const user = data.rows[0];
-  if(user.length > 0) {
-      return res.render('login', {users: data.rows})
+  client.query(userExist, valuesOne)
+    .then(results => {
+      if(results.rows.length > 0) {
+        response.render('/');
+        console.log('this username exist!!!');
+      } else{
+        let SQL= 'INSERT INTO users (username) values ($1);';
+        let values = [username]
 
+        client.query(SQL, values)
+          .then(result => {
+            console.log(result);
+            response.render('/signup')
+          })
+          .catch(error => handleError(error, response));
+      }
+    })
+    .catch(error => handleError(error, response));
 }
 
-});
 
+function show(request, response){
+  response.render('login');
 }
+
+function login(request, response){
+  response.render('index')
+}
+
+function allowIn(request, response) {
+  let username = request.body;
+  let check = 'SELECT * FROM users WHERE username = $1;';
+  let value = [username];
+
+  client.query(check, value)
+    .then(results => {
+      console.log(results);
+      if(results.rowCount !== 0 && results.rows[0].username === username) {
+        response.redirect('index');
+        console.log('success!!!');
+      } else {
+        response.render('login');
+        console.log('this route failed');
+      }
+    })
+    .catch(error => handleError(error, response));
+}
+
+function handleError(error, response) {
+  console.log(error);
+  response.render('error', { error: error });
+}
+
 
    
   
@@ -82,28 +128,7 @@ function login(req, res){
 
 
 
-function  createUser (req, res){
-  const {username} = req.body
-  let SQL = (`INSERT INTO users (username) VALUES ($1);`);
-  let values = (SQL, [req.body.username]);
-  return client.query(SQL, values)
-    .then(result => {
-      let SQL = 'SELECT id FROM users Where username=$1;rs';
-      let values = [req.body.username];
 
-      return client.query(SQL,values)
-        .then(result =>{
-          res.redirect(`/login/${result.rows[0].id}`);
-        })
-
-        .catch(err => handleError(err, res));
-    })
-    .catch(err => handleError(err,res));
-  }
-
-function signUp(request, response) {
-  response.render('signUp.ejs', {users: request.flash('signUpUsers')})
-};
 
 // HELPER FUNCTIONS
 
