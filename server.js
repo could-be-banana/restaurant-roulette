@@ -107,12 +107,12 @@ function getGeocode(request, response) {
 
   superagent.get(url)
     .then(result => {
-      console.log(result.body.results[0]);
+      console.log(result.body.results);
       const location = new Location(request.body, result);
       // response.send(location);
 
 
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=1600&type=restaurant&keyword=restaurant&key=${process.env.GOOGLE_API_KEY}`;
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=1600&type=restaurant&keyword=restaurant&fields=photos/photo_reference&key=${process.env.GOOGLE_API_KEY}`;
 
       console.log(nearbyurl);
     })
@@ -170,7 +170,40 @@ function Location(query, res) {
 //   this.rating = nearby.rating;
 //   this.photo_ref = nearby.photos.photo_reference;
 // }
+// console.log(nearby.name)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Grab results of user's nearby search
+// Constructor for results of nearby search
+function SearchResult(results) {
+  this.name = results.name;
+  this.place_id = results.place_id;
+  this.price = results.price_level;
+  this.rating = results.rating;
+  this.photo_ref = results.photos.photo_reference;
+}
+
+
+// superagent.get(url)
+// .then(apiResponse => console.log(apiResponse.body.items))
+// .then(apiResponse => apiResponse.body.result.map(searchResult => new SearchResult(searchResult.results)))
+// console.log(results);
+// .then(results => response.render('pages/searches/show', { results: results }))
+// .catch(err => handleError(err, response));
+// }
 
 // Error Handler
 function handleError(err, response) {
