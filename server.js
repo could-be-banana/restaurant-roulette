@@ -151,7 +151,10 @@ function getPlaces(request, response) {
 
             superagent.get(detailurl)
             .then(result => {
-              console.log('the result you are mapping is ',result.body.result);
+              // console.log('the result you are mapping is ',result.body.result);
+              console.log('objvalues',Object.values(result.body.result));
+
+              return Object.values(result.body.result);
               // the result is an object, you can't map. we need to use an object method here, whoops!
               // const placeDetails = result.body.result.map(placeid => new Details(placeid));
               // console.log('details!🦑',placeDetails);
