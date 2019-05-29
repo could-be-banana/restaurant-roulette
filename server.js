@@ -35,7 +35,7 @@ app.set('view engine', 'ejs');
 // API Routes
 // Renders the search form
 app.get('/', spinTheWheel);
-app.post('/placeSearch', getGeocode);
+app.post('/placeSearch', getPlaces);
 //Endpoints
 // app.get('/', login)
 // app.get('/signup', signUp)
@@ -92,12 +92,14 @@ app.get('*', (request, response) => response.status(404).send('Nothing to see he
 
 
 // HELPER FUNCTIONS
-// landing page... going to change
+// Landing page... going to change--
+// this calls us to the search initializing page
 function spinTheWheel(request, response) {
   response.render('index');
 }
 
-function getGeocode(request, response) {
+// Our search, so far ❤️
+function getPlaces(request, response) {
   // console.log('hey requst',request.body.placenearby);
   // console.log('💰',request.body.budget);
 
@@ -113,19 +115,16 @@ function getGeocode(request, response) {
       // response.send(location);
 
 
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=50&type=restaurant&keyword=restaurant&key=${process.env.GOOGLE_API_KEY}`;
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=300&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
       // console.log(nearbyurl);
-
-
+      // DON'T FORGET TO CHANGE DISTANCE PARAM BEFORE LAUNCH! SHORTENED TO MAKE FOR EASIER READING WHILE TESTING
+      
       superagent.get(nearbyurl)
         .then(result => {
-          if(result.body.results.price_level===request.body.budget)
-          console.log('💰',request.body.budget);
-          // budget isnt read here
-          // console.log(result.body.results);
-          const nearbyPlaces = result.body.results.filter(nearby => new Place(nearby.price_level===2));
-          // this isnt being filtered either
-          console.log(nearbyPlaces);
+          // console.log('💰',request.body.budget);
+        
+          const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
+          console.log('🥡nearby places!',nearbyPlaces);
         })
     })
     
@@ -145,25 +144,11 @@ function Place(nearby) {
   this.place_id = nearby.place_id;
   this.price = nearby.price_level;
   this.rating = nearby.rating;
-  this.photo_ref = nearby.photos[0].photo_reference|| 'unavailable';
-  // this.photo = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${nearby.photos.photo_reference}&key=${process.env.GOOGLE_API_KEY}`
+  this.photo_ref = nearby.photos[0].photo_reference;
+  this.photo = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${nearby.photos[0].photo_reference}&key=${process.env.GOOGLE_API_KEY}`
 }
 
-// function getNearby(request, response) {
-//   // Define the url for nearby search
-//   const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${request.query.data.latitude}, ${request.query.data.longitude}&radius=1600&type=restaurant&keyword=restaurant&key=${process.env.GOOGLE_API_KEY}`;
-//   // console.log(url);
-
-//   superagent.get(url)
-//     .then(result => {
-//       // console.log(result.body);
-//       const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
-//       response.send(nearbyPlaces);
-//     })
-//     .catch(err => handleError(err, response));
-// }
-
-
+// ***leave this here, I am not done with it yet! - Ai ***
 // function getNearby(request, response) {
 //   // Define the url for nearby search
 //   const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.body.results.nearby.place_id}&fields=address_component,adr_address,alt_id,formatted_address,geometry,icon,id,name,permanently_closed,photo,place_id,plus_code,scope,type,url,utc_offset,vicinity,website,formatted_phone_number,price_level,rating,review,user_ratings_total,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
