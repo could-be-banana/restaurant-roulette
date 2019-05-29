@@ -12,7 +12,7 @@
     <%- include('partials/nav.ejs') %>
   </header>
     <h1><%= users.username %></h1>
-  <form name="Login/<%= users.username %>" method="POST" >
+  <form action="/login" name="Login/<%= users.username %>" method="POST" >
     <lable>Username:</lable>
     <input type="text" name="username" value="<%- users.username %>"  class="form-control" placeholder= "Username:">
     <button class="btn btn-warning btn-lg" type="submit">Login</button>
