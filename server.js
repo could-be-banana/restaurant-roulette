@@ -98,7 +98,8 @@ function spinTheWheel(request, response) {
 }
 
 function getGeocode(request, response) {
-  console.log('hey requst',request.body.placenearby);
+  // console.log('hey requst',request.body.placenearby);
+  // console.log('💰',request.body.budget);
 
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
   
@@ -107,15 +108,27 @@ function getGeocode(request, response) {
 
   superagent.get(url)
     .then(result => {
-      console.log(result.body.results[0]);
+      // console.log(result.body.results[0]);
       const location = new Location(request.body, result);
       // response.send(location);
 
 
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=1600&type=restaurant&keyword=restaurant&key=${process.env.GOOGLE_API_KEY}`;
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=50&type=restaurant&keyword=restaurant&key=${process.env.GOOGLE_API_KEY}`;
+      // console.log(nearbyurl);
 
-      console.log(nearbyurl);
+
+      superagent.get(nearbyurl)
+        .then(result => {
+          if(result.body.results.price_level===request.body.budget)
+          console.log('💰',request.body.budget);
+          // budget isnt read here
+          // console.log(result.body.results);
+          const nearbyPlaces = result.body.results.filter(nearby => new Place(nearby.price_level===2));
+          // this isnt being filtered either
+          console.log(nearbyPlaces);
+        })
     })
+    
     .catch(err => handleError(err, response));
 }
 
@@ -125,6 +138,15 @@ function Location(query, res) {
   this.formatted_query = res.body.results[0].formatted_address;
   this.latitude = res.body.results[0].geometry.location.lat;
   this.longitude = res.body.results[0].geometry.location.lng;
+}
+// placemaker
+function Place(nearby) {
+  this.name = nearby.name;
+  this.place_id = nearby.place_id;
+  this.price = nearby.price_level;
+  this.rating = nearby.rating;
+  this.photo_ref = nearby.photos[0].photo_reference|| 'unavailable';
+  // this.photo = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${nearby.photos.photo_reference}&key=${process.env.GOOGLE_API_KEY}`
 }
 
 // function getNearby(request, response) {
@@ -141,13 +163,6 @@ function Location(query, res) {
 //     .catch(err => handleError(err, response));
 // }
 
-// function Place(nearby) {
-//   this.name = nearby.name;
-//   this.place_id = nearby.place_id;
-//   this.price = nearby.price_level;
-//   this.rating = nearby.rating;
-//   this.photo_ref = nearby.photos.photo_reference;
-// }
 
 // function getNearby(request, response) {
 //   // Define the url for nearby search
@@ -163,13 +178,7 @@ function Location(query, res) {
 //     .catch(err => handleError(err, response));
 // }
 
-// function Place(nearby) {
-//   this.name = nearby.name;
-//   this.place_id = nearby.place_id;
-//   this.price = nearby.price_level;
-//   this.rating = nearby.rating;
-//   this.photo_ref = nearby.photos.photo_reference;
-// }
+
 
 
 // Error Handler
