@@ -144,6 +144,9 @@ function howTo (request, response) {
 
 // Our search, so far ❤️
 function getPlaces(request, response) {
+
+  let tempArr = [];
+
   // console.log('hey requst',request.body.placenearby);
   // console.log('💰',request.body.budget);
 
@@ -161,8 +164,8 @@ function getPlaces(request, response) {
       console.log('location is', location);
 
 
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=300&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
-      // console.log(nearbyurl);
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=50&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
+      console.log(nearbyurl);
       // DON'T FORGET TO CHANGE DISTANCE PARAM BEFORE LAUNCH! SHORTENED TO MAKE FOR EASIER READING WHILE TESTING
       
       superagent.get(nearbyurl)
@@ -187,9 +190,14 @@ function getPlaces(request, response) {
             superagent.get(detailurl)
             .then(result => {
               // console.log('the result you are mapping is ',result.body.result);
-              console.log('objvalues',Object.values(result.body.result));
+              
+              // console.log('🙊',Object.values(result.body.result));
+              const details = new Details(result.body.result);
+              console.log('🐋',details);
 
-              return Object.values(result.body.result);
+              // tempArr.push(Object.values(result.body.result));
+
+              // return Object.values(result.body.result);
               // the result is an object, you can't map. we need to use an object method here, whoops!
               // const placeDetails = result.body.result.map(placeid => new Details(placeid));
               // console.log('details!🦑',placeDetails);
@@ -198,7 +206,6 @@ function getPlaces(request, response) {
 
         })
     })
-    
     .catch(err => handleError(err, response));
 }
 
@@ -215,7 +222,7 @@ function Place(nearby) {
 
 }
 
-// placemaker
+// details
 function Details(placeid) {
   this.name = placeid.name;
   this.place_id = placeid.place_id;
@@ -251,3 +258,7 @@ function handleError(err, response) {
   console.error(err);
   if (response) response.status(500).send('Sorry something went wrong');
 }
+
+
+// Shuffle an array javascript
+// function shuffle ( array ) { array . sort ( ( ) => Math . random ( ) - 0.5 ) ; } let arr = [ 1 , 2 , 3 ] ; shuffle ( arr ) ; alert ( arr ) ; That somewhat works, because Math.random() - 0.5 is a random number that may be positive or negative, so the sorting function reorders elements randomly.
