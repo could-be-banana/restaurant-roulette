@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS restaurants;
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(255) UNIQUE NOT NULL
+  username VARCHAR(10) UNIQUE NOT NULL
 );
  
 
@@ -33,8 +33,6 @@ CREATE TABLE favorites (
 );
 
 
-
-
 INSERT INTO users (username) VALUES ('meron');
 
 -- SELECT * from users;
@@ -53,8 +51,6 @@ INSERT INTO restaurants (name, image_url, place_id, formatted_address, formatted
             ]', '2', '4');
 INSERT INTO favorites (user_id, restaurants_id) VALUES ('1', '1');
 INSERT INTO favorites (user_id, restaurants_id) VALUES ('2', '1');
-
-
 
 
 

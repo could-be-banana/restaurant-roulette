@@ -1,26 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
   <title>Login</title>
-  <%- include('partials/head.ejs') %>
+  <%- include('partials/head') %>
 </head>
 <body>
   <header>
-    <%- include('partials/nav.ejs') %>
+    <%- include('partials/nav') %>
   </header>
-    <h1><%= users.username %></h1>
-  <form action="/login" name="Login/<%= users.username %>" method="POST" >
-    <lable>Username:</lable>
-    <input type="text" name="username" value="<%- users.username %>"  class="form-control" placeholder= "Username:">
-    <button class="btn btn-warning btn-lg" type="submit">Login</button>
-  </form>
+  
+   <h1>Login here!</h1>
+  
+  <div class="login-contanier">
+      <form action="/" method="post" class='form-login-in'>
+        <input type="text" name="username" class="form-control" placeholder="username" requried autofocus>
+        <input type="checkbox" name="remember" class="form-control" placeholder="Remember me">
+  
+        <button type="submit">LogIn</button>
+      </form>
+    </div>
+    <div class="signup-container">
+      <a href="/">Sign Up!</a>
+    </div>
+    
+    <footer>
+    <%- include('partials/footer') %>
+    </footer>
 
-  <hr>
-
-  <p>Already have an account? <a href="/signup>Signup</a></p>
-  <p>or go <a href="/">Signup</a></p>
 </body>
 </html>

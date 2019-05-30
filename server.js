@@ -5,11 +5,11 @@ require('dotenv').config();
 
 // app dependencies
 const express = require('express');
-// const bodyParser = require('body-parser');
 const superagent = require('superagent');
 const pg = require('pg');
 const ejs = require('ejs');
 const method = require('method-override');
+
 
 
 //Application Setup
@@ -28,71 +28,100 @@ app.listen(PORT, () => console.log(`Loud and clear on ${PORT}`));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-
-
-
-
 // ejs!
 app.set('view engine', 'ejs');
 
 // API Routes
-// Renders the search form
+app.get('/', login);
+app.get('/login', show);
+app.post('/signup', addUser);
+app.post('/', allowIn);
 app.get('/', spinTheWheel);
 app.get('/pages/about-us.ejs', aboutUs);
 app.post('/placeSearch', getPlaces);
+app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
+
 //Endpoints
-// app.get('/', login)
-// app.get('/signup', signUp)
-// app.post( '/users',  createUser)
+
 // app.post('/create-search', searchGeocode);
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/add-to-databse', addShop);
 
-app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
+
+// ****Marry's code starts here*****
+
+function addUser(request, response) {
+  console.log('done!', request.body);
 
 
-// LOGIN FN
-// function login(req, res){
-//   let SQL = 'SELECT * FROM users';
-  
-//   if (!res.username) {
-//     return client.query(SQL)
-  
-//   .then(data => {
-//     res.render('login', {users: data.rows});
-//   })
-//   .catch(err => {
-//     console.log(err);
-//     res.render('/error', {err});
-//   });
-// }
-// }
+  let {username} = request.body;
+  username  = username.toLowerCase();
+  console.log('this is the user name:', username);
+
+  let userExist = 'SELECT * FROM users WHERE username = $1;';
+
+  let valuesOne = [username];
+
+  client.query(userExist, valuesOne)
+    .then(results => {
+      if(results.rows.length > 0) {
+        response.render('/');
+        console.log('this username exist!!!');
+      } else{
+        let SQL= 'INSERT INTO users (username) values ($1);';
+        let values = [username]
+
+        client.query(SQL, values)
+          .then(result => {
+            console.log(result);
+            response.render('/signup')
+          })
+          .catch(error => handleError(error, response));
+      }
+    })
+    .catch(error => handleError(error, response));
+}
 
 
-// function  createUser (req, res){
-//   const {username} = req.body
-//   let SQL = (`INSERT INTO users (username) VALUES ($1);`);
-//   let values = (SQL, [req.body.username]);
-//   return client.query(SQL, values)
-//     .then(result => {
-//       let SQL = 'SELECT id FROM users Where username=$1;rs';
-//       let values = [req.body.username];
+function show(request, response){
+  response.render('login');
+}
 
-//       return client.query(SQL,values)
-//         .then(result =>{
-//           res.redirect(`/login/${result.rows[0].id}`);
-//         })
+function login(request, response){
+  response.render('index')
+}
 
-//         .catch(err => handleError(err, res));
-//     })
-//     .catch(err => handleError(err,res));
-//   }
+function allowIn(request, response) {
+  let username = request.body;
+  let check = 'SELECT * FROM users WHERE username = $1;';
+  let value = [username];
+
+  client.query(check, value)
+    .then(results => {
+      console.log(results);
+      if(results.rowCount !== 0 && results.rows[0].username === username) {
+        response.redirect('index');
+        console.log('success!!!');
+      } else {
+        response.render('login');
+        console.log('this route failed');
+      }
+    })
+    .catch(error => handleError(error, response));
+}
+
+function handleError(error, response) {
+  console.log(error);
+  response.render('error', { error: error });
+}
+
 
 // function signUp(request, response) {
 //   response.render('signUp.ejs', {users: request.flash('signUpUsers')})
 // };
 
+// ****Marry's code ends here***
 
 
 // HELPER FUNCTIONS
