@@ -32,11 +32,11 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 // API Routes
+app.get('/', show);
 app.get('/', login);
-app.get('/login', show);
-app.post('/signup', addUser);
 app.post('/', allowIn);
-app.get('/', spinTheWheel);
+app.post('/signup', addUser);
+app.get('/pages/index.ejs', spinTheWheel);
 app.get('/pages/about-us.ejs', aboutUs);
 app.post('/placeSearch', getPlaces);
 app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
@@ -89,7 +89,7 @@ function show(request, response){
 }
 
 function login(request, response){
-  response.render('index')
+  response.render('pages/index');
 }
 
 function allowIn(request, response) {
