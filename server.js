@@ -113,11 +113,6 @@ function allowIn(request, response) {
     .catch(error => handleError(error, response));
 }
 
-function handleError(error, response) {
-  console.log(error);
-  response.render('error', { error: error });
-}
-
 
 // function signUp(request, response) {
 //   response.render('signUp.ejs', {users: request.flash('signUpUsers')})
