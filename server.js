@@ -28,10 +28,6 @@ app.listen(PORT, () => console.log(`Loud and clear on ${PORT}`));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-
-
-
-
 // ejs!
 app.set('view engine', 'ejs');
 
@@ -39,6 +35,7 @@ app.set('view engine', 'ejs');
 // Renders the search form
 app.get('/', spinTheWheel);
 app.get('/pages/about-us.ejs', aboutUs);
+app.get('/pages/how-to.ejs', howTo);
 app.post('/placeSearch', getPlaces);
 //Endpoints
 // app.get('/', login)
@@ -105,6 +102,10 @@ function spinTheWheel(request, response) {
 //Rendering About Us page
 function aboutUs (request, response) {
   response.render('pages/about-us');
+}
+
+function howTo (request, response) {
+  response.render('pages/how-to');
 }
 
 // Our search, so far ❤️
