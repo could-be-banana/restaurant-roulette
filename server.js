@@ -118,13 +118,6 @@ function allowIn(request, response) {
 }
 
 
-
-function handleError(error, response) {
-  console.log(error);
-  response.render('error', { error: error });
-}
-
-
 // function signUp(request, response) {
 //   response.render('signUp.ejs', {users: request.flash('signUpUsers')})
 // };
@@ -261,10 +254,15 @@ function Details(placeid) {
 app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
 
 // Error Handler
-function handleError(err, response) {
-  console.error(err);
-  if (response) response.status(500).send('Sorry something went wrong');
-}
+// function handleError(err, response) {
+//   console.error(err);
+//   if (response) response.status(500).send('Sorry something went wrong');
+// }
+
+function handleError(error, response) {
+ console.log(error);
+ response.render('error', { error: error });
+} 
 
 // Shuffle an array javascript
 // function shuffle ( array ) { array . sort ( ( ) => Math . random ( ) - 0.5 ) ; } let arr = [ 1 , 2 , 3 ] ; shuffle ( arr ) ; alert ( arr ) ; That somewhat works, because Math.random() - 0.5 is a random number that may be positive or negative, so the sorting function reorders elements randomly.
