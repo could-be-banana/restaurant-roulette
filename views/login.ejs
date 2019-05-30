@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <title>Login</title>
   <%- include('partials/head') %>
 </head>
@@ -13,7 +12,7 @@
    <h1>Login here!</h1>
   
   <div class="login-contanier">
-      <form action="/" method="post" class='form-login-in'>
+      <form action="/login" method="post" class='form-login-in'>
         <input type="text" name="username" class="form-control" placeholder="username" requried autofocus>
         <input type="checkbox" name="remember" class="form-control" placeholder="Remember me">
   
@@ -21,7 +20,7 @@
       </form>
     </div>
     <div class="signup-container">
-      <a href="/">Sign Up!</a>
+      <a href="/sign-up">Sign Up!</a>
     </div>
     
     <footer>
