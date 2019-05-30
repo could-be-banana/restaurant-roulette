@@ -38,6 +38,7 @@ app.post('/signup', addUser);
 app.post('/', allowIn);
 app.get('/', spinTheWheel);
 app.get('/pages/about-us.ejs', aboutUs);
+app.get('/pages/how-to.ejs', howTo);
 app.post('/placeSearch', getPlaces);
 app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
 
@@ -134,6 +135,10 @@ function spinTheWheel(request, response) {
 //Rendering About Us page
 function aboutUs (request, response) {
   response.render('pages/about-us');
+}
+
+function howTo (request, response) {
+  response.render('pages/how-to');
 }
 
 // Our search, so far ❤️
