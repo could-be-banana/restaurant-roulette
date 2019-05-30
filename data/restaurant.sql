@@ -3,6 +3,7 @@
 DROP TABLE IF EXISTS favorites;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS restaurants;
+DROP TABLE IF EXISTS temp;
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -13,14 +14,31 @@ CREATE TABLE users (
 CREATE TABLE restaurants (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255),
-  image_url VARCHAR(255),
   place_id VARCHAR(255),
-  formatted_address VARCHAR(255),
-  formatted_phone_number VARCHAR(255),
+  price VARCHAR(255),
+  rating VARCHAR(255),
+  photo_ref VARCHAR(500),
+  photo VARCHAR(1000),
   website VARCHAR(255),
-  weekday_text VARCHAR(400),
-  price_level VARCHAR(255),
-  rating VARCHAR(255)
+  formatted_address VARCHAR(255),
+  quick_address VARCHAR(255),
+  formatted_phone_number VARCHAR(255),
+  hours VARCHAR(400)
+);
+
+CREATE TABLE temp (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255),
+  place_id VARCHAR(255),
+  price VARCHAR(255),
+  rating VARCHAR(255),
+  photo_ref VARCHAR(500),
+  photo VARCHAR(1000),
+  website VARCHAR(255),
+  formatted_address VARCHAR(255),
+  quick_address VARCHAR(255),
+  formatted_phone_number VARCHAR(255),
+  hours VARCHAR(400)
 );
   
 
@@ -39,8 +57,8 @@ INSERT INTO users (username) VALUES ('meron');
 
 INSERT INTO users (username) VALUES ('userOne');
 INSERT INTO users (username) VALUES ('userTwo');
-INSERT INTO restaurants (name, image_url, place_id, formatted_address, formatted_phone_number, website, weekday_text, price_level, rating) VALUES ('Yummy Food', '', 'test place_id', '123 Main Street, Anytown, USA', '(555) 555-1212', 'https://google.com', 'hours here', '1', '4');
-INSERT INTO restaurants (name, image_url, place_id, formatted_address, formatted_phone_number, website, weekday_text, price_level, rating) VALUES ('Shake Shack', '', 'ChIJGzI5Xu8VkFQR5GlNg-K43Sg', '2115 Westlake Ave, Seattle, WA 98121, USA', '(206) 279-2313', 'https://www.shakeshack.com/', '[
+INSERT INTO restaurants (name, photo_ref, place_id, formatted_address, formatted_phone_number, website, hours, price, rating) VALUES ('Yummy Food', '', 'test place_id', '123 Main Street, Anytown, USA', '(555) 555-1212', 'https://google.com', 'hours here', '1', '4');
+INSERT INTO restaurants (name, photo_ref, place_id, formatted_address, formatted_phone_number, website, hours, price, rating) VALUES ('Shake Shack', '', 'ChIJGzI5Xu8VkFQR5GlNg-K43Sg', '2115 Westlake Ave, Seattle, WA 98121, USA', '(206) 279-2313', 'https://www.shakeshack.com/', '[
                 "Monday: 11:00 AM – 10:00 PM",
                 "Tuesday: 11:00 AM – 10:00 PM",
                 "Wednesday: 11:00 AM – 10:00 PM",
