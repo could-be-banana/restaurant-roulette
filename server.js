@@ -123,6 +123,8 @@ function getPlaces(request, response) {
       const location = new Location(request.body, result);
       // response.send(location);
 
+      console.log('location is', location);
+
 
       const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=300&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
       // console.log(nearbyurl);
@@ -133,7 +135,32 @@ function getPlaces(request, response) {
           // console.log('💰',request.body.budget);
         
           const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
-          console.log('🥡nearby places!',nearbyPlaces);
+
+          Place.prototype.toString = function placeString() {
+            return '' + this.place_id;
+          }
+          // console.log('🥡nearbyPlaces is an array of plac_id objs',nearbyPlaces);
+
+          nearbyPlaces.forEach(element => {
+            // console.log('element.place_id', element.toString());
+
+            let placeKey = element.toString();
+            // console.log(placeKey);
+
+            const detailurl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeKey}&fields=formatted_address,name,permanently_closed,photo,place_id,type,url,vicinity,website,formatted_phone_number,price_level,rating,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
+
+            superagent.get(detailurl)
+            .then(result => {
+              // console.log('the result you are mapping is ',result.body.result);
+              console.log('objvalues',Object.values(result.body.result));
+
+              return Object.values(result.body.result);
+              // the result is an object, you can't map. we need to use an object method here, whoops!
+              // const placeDetails = result.body.result.map(placeid => new Details(placeid));
+              // console.log('details!🦑',placeDetails);
+            })
+          });
+
         })
     })
     
@@ -149,29 +176,38 @@ function Location(query, res) {
 }
 // placemaker
 function Place(nearby) {
-  this.name = nearby.name;
   this.place_id = nearby.place_id;
-  this.price = nearby.price_level;
-  this.rating = nearby.rating;
-  this.photo_ref = nearby.photos[0].photo_reference;
-  this.photo = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${nearby.photos[0].photo_reference}&key=${process.env.GOOGLE_API_KEY}`
+
 }
 
-// ***leave this here, I am not done with it yet! - Ai ***
-// function getNearby(request, response) {
-//   // Define the url for nearby search
-//   const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.body.results.nearby.place_id}&fields=address_component,adr_address,alt_id,formatted_address,geometry,icon,id,name,permanently_closed,photo,place_id,plus_code,scope,type,url,utc_offset,vicinity,website,formatted_phone_number,price_level,rating,review,user_ratings_total,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
-//   // console.log(url);
+// placemaker
+function Details(placeid) {
+  this.name = placeid.name;
+  this.place_id = placeid.place_id;
+  this.price = placeid.price_level;
+  this.rating = placeid.rating;
+  this.photo_ref = placeid.photos[0].photo_reference;
+  this.photo = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${placeid.photos[0].photo_reference}&key=${process.env.GOOGLE_API_KEY}`;
+  this.website = placeid.website;
+  this.formatted_address = placeid.formatted_address;
+  this.quick_address = placeid.vicinity;
+  this.formatted_phone_number = placeid.formatted_phone_number;
+  this.hours = placeid.opening_hours.weekday_text;
 
-//   superagent.get(url)
-//     .then(result => {
-//       // console.log(result.body);
-//       const placeDetails = result.body.results.map(details => new Deets(details));
-//       response.send(placeDetails);
-//     })
-//     .catch(err => handleError(err, response));
-// }
-
+  // formatted_address,
+  // name,
+  // permanently_closed,
+  // photo,
+  // place_id,
+  // type,
+  // url,
+  // vicinity,
+  // website,
+  // formatted_phone_number,
+  // price_level,
+  // rating,
+  // opening_hours
+}
 
 
 
