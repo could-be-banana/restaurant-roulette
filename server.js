@@ -16,10 +16,10 @@ const method = require('method-override');
 const app = express();
 const PORT = process.env.PORT;
 const client = new pg.Client(process.env.DATABASE_URL);
+client.connect();
+client.on('err', err => console.error(err));
 
 
-// client.connect();
-// client.on('err', err => console.error(err));
 
 // listen!
 app.listen(PORT, () => console.log(`Loud and clear on ${PORT}`));
@@ -30,17 +30,18 @@ app.use(express.static('public'));
 
 // ejs!
 app.set('view engine', 'ejs');
+app.set('view options', { layout: false });
 
 // API Routes
-app.get('/', show);
-app.get('/', login);
-app.post('/', allowIn);
+app.get('/', getLogIn);
+app.get('/signup', showForm);
+app.post('/login', allowIn);
 app.post('/signup', addUser);
 app.get('/pages/index.ejs', spinTheWheel);
 app.get('/pages/about-us.ejs', aboutUs);
 app.get('/pages/how-to.ejs', howTo);
 app.post('/placeSearch', getPlaces);
-app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
+
 
 
 //Endpoints
@@ -58,8 +59,11 @@ function addUser(request, response) {
 
 
   let {username} = request.body;
-  username  = username.toLowerCase();
-  console.log('this is the user name:', username);
+
+  username = username.toLowerCase();
+
+  
+  console.log('this is the user name: ', username);
 
   let userExist = 'SELECT * FROM users WHERE username = $1;';
 
@@ -68,16 +72,16 @@ function addUser(request, response) {
   client.query(userExist, valuesOne)
     .then(results => {
       if(results.rows.length > 0) {
-        response.render('/');
+        response.redirect('signup');
         console.log('this username exist!!!');
       } else{
-        let SQL= 'INSERT INTO users (username) values ($1);';
+        let SQL= 'INSERT INTO users (username) VALUES ($1);';
         let values = [username]
 
         client.query(SQL, values)
           .then(result => {
             console.log(result);
-            response.render('/signup')
+            response.redirect('/')
           })
           .catch(error => handleError(error, response));
       }
@@ -86,12 +90,12 @@ function addUser(request, response) {
 }
 
 
-function show(request, response){
+function getLogIn(request, response){
   response.render('login');
 }
 
-function login(request, response){
-  response.render('pages/index');
+function showForm(request, response){
+  response.render('signup');
 }
 
 function allowIn(request, response) {
@@ -103,15 +107,17 @@ function allowIn(request, response) {
     .then(results => {
       console.log(results);
       if(results.rowCount !== 0 && results.rows[0].username === username) {
-        response.redirect('index');
+        response.redirect('login');
         console.log('success!!!');
       } else {
-        response.render('login');
+        response.render('pages/index');
         console.log('this route failed');
       }
     })
     .catch(error => handleError(error, response));
 }
+
+
 
 function handleError(error, response) {
   console.log(error);
@@ -252,13 +258,13 @@ function Details(placeid) {
 }
 
 
+app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
 
 // Error Handler
 function handleError(err, response) {
   console.error(err);
   if (response) response.status(500).send('Sorry something went wrong');
 }
-
 
 // Shuffle an array javascript
 // function shuffle ( array ) { array . sort ( ( ) => Math . random ( ) - 0.5 ) ; } let arr = [ 1 , 2 , 3 ] ; shuffle ( arr ) ; alert ( arr ) ; That somewhat works, because Math.random() - 0.5 is a random number that may be positive or negative, so the sorting function reorders elements randomly.
