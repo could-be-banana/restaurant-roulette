@@ -41,6 +41,7 @@ app.get('/pages/about-us.ejs', aboutUs);
 app.post('/placeSearch', getPlaces);
 app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
 
+
 //Endpoints
 
 // app.post('/create-search', searchGeocode);
