@@ -164,7 +164,7 @@ function getPlaces(request, response) {
       console.log('location is', location);
 
 
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=50&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude},${location.longitude}&radius=500&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
       console.log(nearbyurl);
       // DON'T FORGET TO CHANGE DISTANCE PARAM BEFORE LAUNCH! SHORTENED TO MAKE FOR EASIER READING WHILE TESTING
       
@@ -188,25 +188,28 @@ function getPlaces(request, response) {
             const detailurl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeKey}&fields=formatted_address,name,permanently_closed,photo,place_id,type,url,vicinity,website,formatted_phone_number,price_level,rating,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
 
             superagent.get(detailurl)
-            .then(result => {
-              // console.log('the result you are mapping is ',result.body.result);
-              
-              // console.log('🙊',Object.values(result.body.result));
-              const details = new Details(result.body.result);
-              console.log('🐋',details);
+              .then(result => {
+                // console.log('the result you are mapping is ',result.body.result);
+                
+                // console.log('🙊',Object.values(result.body.result));
+                const details = new Details(result.body.result);
+                console.log('🐋',details);
 
-              // tempArr.push(Object.values(result.body.result));
+                // tempArr.push(Object.values(result.body.result));
 
-              // return Object.values(result.body.result);
-              // the result is an object, you can't map. we need to use an object method here, whoops!
-              // const placeDetails = result.body.result.map(placeid => new Details(placeid));
-              // console.log('details!🦑',placeDetails);
-            })
-          });
+                return Object.values(result.body.result);
+                // the result is an object, you can't map. we need to use an object method here, whoops!
+                // const placeDetails = result.body.result.map(placeid => new Details(placeid));
+                // console.log('details!🦑',placeDetails);
+              })
+            });
 
         })
     })
-    .catch(err => handleError(err, response));
+    .catch(err => {
+      console.log('THERE WAS AN ERROR!')
+      handleError(err, response)
+    });
 }
 
 // geocode constructor
