@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%- include('../partials/head') %>
+</head>
+
+<body>
+  <header>
+    <%- include('../partials/nav') %>
+  </header>
+  <main>
+    <div id="roulette"></div>
+
+    <div class="controls">
+        <p>Don't know what to eat? Send burrito-cat your location and budget and let her do the work!</p>
+       
+  
+        <p>name your price!</p>
+        <form action="/placeSearch" method="post">
+          <p>Location here:</p>
+          <input type="text" placeholder="set location here" name="placenearby" required></input>
+          <input list="budget" name="budget">
+          <datalist id="budget">
+            <option value="1">
+            <option value="2">
+            <option value="3">
+            <option value="4">
+          </datalist>
+          <button type="submit">submit</button>
+        </form>
+<!--       
+      <form action="/placeSearch" method="post">
+        <p>Location here:</p>
+      <input type="text" placeholder="set location here" name="placenearby" required></input>
+        <p>name your price!</p>
+        <input list="budget" name="budget">
+        <datalist id="budget">
+          <option value="$">
+          <option value="$-$$">
+          <option value="$$-$$$">
+          <option value="$$$-$$$$">
+        </datalist>
+        <input type="submit" name="placenearby">
+      </form>
+    </div> -->
+   
+  </main>
+  <footer>
+    <%- include('../partials/footer') %>
+
+  </footer>
+</body>
+
+</html>
+
+        
+        

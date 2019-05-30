@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/could-be-banana/restaurant-roulette#readme",
   "dependencies": {
-    "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",
     "ejs": "^2.6.1",
     "express": "^4.17.0",
