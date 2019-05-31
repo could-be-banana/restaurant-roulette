@@ -49,7 +49,9 @@ app.post('/placeSearch', getPlaces);
 // app.post('/create-search', searchGeocode);
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
-// app.post('/add-to-databse', addShop);
+app.post('/add-to-database', addShop);
+app.post('/add-to-results', saveResults);
+// app.post('/show-shop', showShop);
 
 
 // ****Marry's code starts here*****
@@ -62,7 +64,7 @@ function addUser(request, response) {
 
   username = username.toLowerCase();
 
-  
+
   console.log('this is the user name: ', username);
 
   let userExist = 'SELECT * FROM users WHERE username = $1;';
@@ -150,7 +152,7 @@ function getPlaces(request, response) {
   // console.log('💰',request.body.budget);
 
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
-  
+
   // console.log(url);
 
 
@@ -163,14 +165,14 @@ function getPlaces(request, response) {
       console.log('location is', location);
 
 
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=50&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=500&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
       console.log(nearbyurl);
       // DON'T FORGET TO CHANGE DISTANCE PARAM BEFORE LAUNCH! SHORTENED TO MAKE FOR EASIER READING WHILE TESTING
-      
+
       superagent.get(nearbyurl)
         .then(result => {
           // console.log('💰',request.body.budget);
-        
+
           const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
 
           Place.prototype.toString = function placeString() {
@@ -189,10 +191,14 @@ function getPlaces(request, response) {
             superagent.get(detailurl)
             .then(result => {
               // console.log('the result you are mapping is ',result.body.result);
-              
+
               // console.log('🙊',Object.values(result.body.result));
               const details = new Details(result.body.result);
               console.log('🐋',details);
+              (results => {
+                console.log(result.body);
+                return saveResults(result.body);
+              })
 
               // tempArr.push(Object.values(result.body.result));
 
@@ -207,6 +213,54 @@ function getPlaces(request, response) {
     })
     .catch(err => handleError(err, response));
 }
+
+//----Richard's code starts here--------------------
+
+// Add search result details to a temp table in the database to be read for 1) selecting a result at random to display on the page and 2) to save the random result to the restaurant (history) table.
+
+
+function saveResults(request, response) {
+
+  let { name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours } = request.body;
+  let SQL = 'INSERT INTO temp (name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
+  let values = [name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours];
+
+  return client.query(SQL, values)
+    .then(result => response.redirect('/add-to-results'))
+    .catch(err => handleError(err, response));
+}
+
+// Add a shop (restaurant) to restaurants table when it gets "randomly" selected from the temp table of search results.
+// If both saveResults and addShop functions are used, refactor to use same SQL code, time permitting.
+
+function addShop(request, response) {
+
+  let { name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours } = request.body;
+  let SQL = 'INSERT INTO retaurants (name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
+  let values = [name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours];
+
+  return client.query(SQL, values)
+    .then(result => response.redirect('/add-to-database'))
+    .catch(err => handleError(err, response));
+
+}
+
+// Select a random restaurant to 1) display on the page and 2) save to history/favorites
+
+// function showShop(request, response) {
+//   getRandom()
+//     .then(shelves => {
+//       let SQL = 'SELECT * FROM temp WHERE id=$1;';
+//       let values = [request.params.id];
+//       client.query(SQL, values)
+//         .then(result => response.render('show-shop', { temp: place_id,  }))
+//         .catch(err => handleError(err, response));
+//     })
+// }
+
+// function getRandom
+
+// -------Richard's code ends here-------------------
 
 // geocode constructor
 function Location(query, res) {
@@ -262,7 +316,7 @@ app.get('*', (request, response) => response.status(404).send('Nothing to see he
 function handleError(error, response) {
  console.log(error);
  response.render('error', { error: error });
-} 
+}
 
 // Shuffle an array javascript
 // function shuffle ( array ) { array . sort ( ( ) => Math . random ( ) - 0.5 ) ; } let arr = [ 1 , 2 , 3 ] ; shuffle ( arr ) ; alert ( arr ) ; That somewhat works, because Math.random() - 0.5 is a random number that may be positive or negative, so the sorting function reorders elements randomly.
