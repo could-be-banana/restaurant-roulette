@@ -192,7 +192,7 @@ function getPlaces(request, response) {
 
               // console.log('🙊',Object.values(result.body.result));
               const details = new Details(result.body.result);
-              console.log('🐋',details);
+              // console.log('🐋',details);
               // (results => {
               //   console.log(result.body);
               //   return saveResults(result.body);
