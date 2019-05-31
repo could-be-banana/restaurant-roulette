@@ -58,7 +58,7 @@ function addUser(request, response) {
   console.log('done!', request.body);
 
 
-  let {username} = request.body;
+  let { username } = request.body;
 
   username = username.toLowerCase();
 
@@ -71,11 +71,11 @@ function addUser(request, response) {
 
   client.query(userExist, valuesOne)
     .then(results => {
-      if(results.rows.length > 0) {
+      if (results.rows.length > 0) {
         response.redirect('login');
         console.log('this username exist!!!');
-      } else{
-        let SQL= 'INSERT INTO users (username) VALUES ($1);';
+      } else {
+        let SQL = 'INSERT INTO users (username) VALUES ($1);';
         let values = [username]
 
         client.query(SQL, values)
@@ -90,11 +90,11 @@ function addUser(request, response) {
 }
 
 
-function getLogIn(request, response){
+function getLogIn(request, response) {
   response.render('login');
 }
 
-function showForm(request, response){
+function showForm(request, response) {
   response.render('signup');
 }
 
@@ -106,7 +106,7 @@ function allowIn(request, response) {
   client.query(check, value)
     .then(results => {
       console.log(results);
-      if(results.rowCount !== 0 && results.rows[0].username === username) {
+      if (results.rowCount !== 0 && results.rows[0].username === username) {
         response.redirect('/pages/index');
         console.log('success!!!');
       } else {
@@ -133,87 +133,50 @@ function spinTheWheel(request, response) {
 }
 
 //Rendering About Us page
-function aboutUs (request, response) {
+function aboutUs(request, response) {
   response.render('pages/about-us');
 }
 
-function howTo (request, response) {
+function howTo(request, response) {
   response.render('pages/how-to');
 }
-
+// ****************************************
 // Our search, so far ❤️
 function getPlaces(request, response) {
-
-  let tempArr = [];
-
-  // console.log('hey requst',request.body.placenearby);
-  // console.log('💰',request.body.budget);
-
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
-
-  // console.log(url);
-
-
   superagent.get(url)
     .then(result => {
-      // console.log(result.body.results[0]);
+      let tempArr=[];
       const location = new Location(request.body, result);
-      // response.send(location);
-
-      console.log('location is', location);
-
-
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=500&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
-      console.log(nearbyurl);
-      // DON'T FORGET TO CHANGE DISTANCE PARAM BEFORE LAUNCH! SHORTENED TO MAKE FOR EASIER READING WHILE TESTING
-
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=50&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
       superagent.get(nearbyurl)
         .then(result => {
-          // console.log('💰',request.body.budget);
-
           const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
-
-          Place.prototype.toString = function placeString() {
-            return '' + this.place_id;
-          }
-          // console.log('🥡nearbyPlaces is an array of plac_id objs',nearbyPlaces);
-
+          Place.prototype.toString = function placeString(){return '' + this.place_id;};
+          let arr=[];
           nearbyPlaces.forEach(element => {
-            // console.log('element.place_id', element.toString());
-
             let placeKey = element.toString();
-            // console.log(placeKey);
-
-            const detailurl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeKey}&fields=formatted_address,name,photo,place_id,type,url,vicinity,website,formatted_phone_number,price_level,rating,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
-
+            const detailurl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeKey}&fields=formatted_address,name,permanently_closed,photo,place_id,type,url,vicinity,website,formatted_phone_number,price_level,rating,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
             superagent.get(detailurl)
             .then(result => {
-              // console.log('the result you are mapping is ',result.body.result);
+              const placeDetails= new Details(result.body.result);
 
-              // console.log('🙊',Object.values(result.body.result));
-              const details = new Details(result.body.result);
-              // console.log('🐋',details);
-              // (results => {
-              //   console.log(result.body);
-              //   return saveResults(result.body);
-              // })
-
-              tempArr.push(details);
-
-              // return Object.values(result.body.result);
               // the result is an object, you can't map. we need to use an object method here, whoops!
               // const placeDetails = result.body.result.map(placeid => new Details(placeid));
               // console.log('details!🦑',placeDetails);
+              arr.push(placeDetails);
+              console.log(arr,'arr🦑');
+              tempArr.push(arr);
+              console.log(tempArr[1],'🙈')
+              response.render('pages/show-results.ejs', { searchResults: arr });
             })
           });
-
         })
+        // .then(console.log(tempArr,'🙈'))
     })
-    // .then(results => console.log(results, '{ searchResults: results }'))
-    
     .catch(err => handleError(err, response));
-    console.log(tempArr)
 }
+
 
 //----Richard's code starts here--------------------
 
@@ -225,7 +188,7 @@ function saveResults(request, response) {
   let { name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours } = request.body;
 
   let SQL = 'INSERT INTO temp (name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
-  
+
   let values = [name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours];
 
   return client.query(SQL, values)
@@ -316,8 +279,8 @@ app.get('*', (request, response) => response.status(404).send('Nothing to see he
 // }
 
 function handleError(error, response) {
- console.log(error);
- response.render('error', { error: error });
+  console.log(error);
+  response.render('error', { error: error });
 }
 
 // Shuffle an array javascript
