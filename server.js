@@ -140,82 +140,42 @@ function aboutUs(request, response) {
 function howTo(request, response) {
   response.render('pages/how-to');
 }
-
+// ****************************************
 // Our search, so far ❤️
 function getPlaces(request, response) {
-
-  let tempArr = [];
-
-  // console.log('hey requst',request.body.placenearby);
-  // console.log('💰',request.body.budget);
-
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
-
-  // console.log(url);
-
-
   superagent.get(url)
     .then(result => {
-      // console.log(result.body.results[0]);
+      let tempArr=[];
       const location = new Location(request.body, result);
-      // response.send(location);
-
-      console.log('location is', location);
-
-
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=500&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
-      console.log(nearbyurl);
-      // DON'T FORGET TO CHANGE DISTANCE PARAM BEFORE LAUNCH! SHORTENED TO MAKE FOR EASIER READING WHILE TESTING
-
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=50&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
       superagent.get(nearbyurl)
         .then(result => {
-          // console.log('💰',request.body.budget);
-
           const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
-
-          Place.prototype.toString = function placeString() {
-            return '' + this.place_id;
-          }
-          // console.log('🥡nearbyPlaces is an array of plac_id objs',nearbyPlaces);
-
-          let placeKeys = nearbyPlaces.map((element) => {
-            return element.toString();
-          });
-          // console.log('🔑',placeKeys);
-          return placeKeys;
-        })
-        .then(result => {
-          console.log(result)
-          // let placeDetails = []
-          result.forEach((element) => {
-            const detailurl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${element}&fields=formatted_address,name,photo,place_id,type,url,vicinity,website,formatted_phone_number,price_level,rating,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
-
+          Place.prototype.toString = function placeString(){return '' + this.place_id;};
+          let arr=[];
+          nearbyPlaces.forEach(element => {
+            let placeKey = element.toString();
+            const detailurl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeKey}&fields=formatted_address,name,permanently_closed,photo,place_id,type,url,vicinity,website,formatted_phone_number,price_level,rating,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
             superagent.get(detailurl)
-              .then(result => {
-
-                const details = new Details(result.body.result);
-                // console.log('🐋',details);
-                return details
-              })
-              .then(result => {
-                let placeDetails = []
-                console.log('🥰',result);
-                placeDetails.push(result);
-                return placeDetails;
-              })
+            .then(result => {
+              const placeDetails= new Details(result.body.result);
+              // the result is an object, you can't map. we need to use an object method here, whoops!
+              // const placeDetails = result.body.result.map(placeid => new Details(placeid));
+              // console.log('details!🦑',placeDetails);
+              arr.push(placeDetails);
+              console.log(arr,'arr🦑');
+              tempArr.push(arr);
+              console.log(tempArr[1],'🙈')
+              response.render('pages/show-results.ejs', { searchResults: arr });
+            })
           });
-          console.log('🛐',placeDetails);
-          return placeDetails;
         })
-        .then(results => { console.log('㊗️', results); })
-      // response.render('pages/show-results.ejs', { searchResults: results }); 
-      // console.log('🛐',placeDetails);
+        // .then(console.log(tempArr,'🙈'))
     })
-    // .then(results => console.log(results, '{ searchResults: results }'))
-
     .catch(err => handleError(err, response));
-  console.log(tempArr)
 }
+
 
 //----Richard's code starts here--------------------
 

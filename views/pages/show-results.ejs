@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Today I'm Eating...</title>
   <%- include('../partials/head') %>
 </head>
 
@@ -12,14 +13,14 @@
     <%- include('../partials/nav') %>
   </header>
   <main>
+    <section class="controls">
       <h1>Search Results</h1>
   
       <ul class="add-form">
         <% searchResults.forEach(placeDetails => { %>
           <li>
-            <img src=<%= placeDetails.photo %> alt=Cover for <%= placeDetails.name %> />
+            <img src="<%= placeDetails.photo %>"" alt=Cover for <%= placeDetails.name %> />
             <h2><%= placeDetails.name %></h2>
-            <h3><%= placeDetails.photo %></h3>
             <p><%= placeDetails.website %></p>
             <p><%= placeDetails.quick_address %></p>
             <p><%= placeDetails.formatted_phone_number %></p>
@@ -41,11 +42,13 @@
           </li>
         <% }) %>
       </ul>
+    </section>
     </main>
-  <footer>
-    <%- include('../partials/footer') %>
-
-  </footer>
-</body>
-
-</html>
+    <footer>
+      <%- include('../partials/footer') %>
+  
+    </footer>
+  </body>
+  
+  </html>
+  
