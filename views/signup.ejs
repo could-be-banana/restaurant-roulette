@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <title>Sign Up</title>
+  <%- include('partials/head') %>
+</head>
+<body>
+  <header>
+      <%- include('partials/nav') %>
+  </header>
+
+  <h1>Sign Up Here</h1>
+  <div class="signup-container">
+    <form class="form-signup" action="/signup" method="post">
+      <input type="text" name="username" class="form-control" placeholder="Username" required>
+      <button type="submit">Sign Up</button>
+    </form>
+  </div>
+  <div class="login-container">
+    <a href="/">Login</a>
+  </div>
+  
+<footer>
+<%- include('partials/footer') %>
+</footer>
+
+
+
+</body>
+</html>

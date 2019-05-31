@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Login</title>
+  <%- include('partials/head') %>
+</head>
+<body>
+  <header>
+    <%- include('partials/nav') %>
+  </header>
+  
+   <h1>Login here!</h1>
+  
+  <div class="login-contanier">
+      <form action="/login" method="post" class='form-login-in'>
+        <input type="text" name="username" class="form-control" placeholder="username" requried autofocus>
+        <input type="checkbox" name="remember" class="form-control" placeholder="Remember me">
+        <button type="submit">LogIn</button>
+      </form>
+       
+  
+    </div>
+    <div class="signup-container">
+      <a href="/signup">Sign Up!</a>
+    </div>
+    
+    <footer>
+    <%- include('partials/footer') %>
+    </footer>
+
+</body>
+</html>

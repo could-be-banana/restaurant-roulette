@@ -1,13 +1,16 @@
 'use strict';
 
-//PROVIDE ACCESS TO ENVIROMENT VARIABLES IN .env
+// envir variables
 require('dotenv').config();
 
-//Application Dependencies
+// app dependencies
 const express = require('express');
 const superagent = require('superagent');
 const pg = require('pg');
+const ejs = require('ejs');
 const method = require('method-override');
+
+
 
 //Application Setup
 const app = express();
@@ -15,135 +18,307 @@ const PORT = process.env.PORT;
 const client = new pg.Client(process.env.DATABASE_URL);
 client.connect();
 client.on('err', err => console.error(err));
-app.listen(PORT, () => console.log(`Its alive ${PORT}`));
 
-//Application Middleware
-app.use(express.urlencoded({ extended: true}));
+
+
+// listen!
+app.listen(PORT, () => console.log(`Loud and clear on ${PORT}`));
+
+// Application Middleware
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-app.use(method(function (request) {
-  if (request.body && typeof request.body === 'object' && '_method' in request.body) {
-    let method = request.body._method;
-    delete request.body._method;
-    return method;
-  }
-}));
-
-//Set the view engine for server-side templating
+// ejs!
 app.set('view engine', 'ejs');
+//look into app.set view options
+app.set('view options', { layout: false });
 
+// API Routes
+app.get('/', getLogIn);
+app.get('/signup', showForm);
+app.post('/login', allowIn);
+app.post('/signup', addUser);
+app.get('/pages/index.ejs', spinTheWheel);
+app.get('/pages/about-us.ejs', aboutUs);
+app.get('/pages/how-to.ejs', howTo);
+app.post('/placeSearch', getPlaces);
 
-//Endpoints
-app.get('/', (request, response) => response.send("Proof of Life"));
-app.post('/create-search', searchGeocode);
+app.post('/add-to-database', addShop);
+app.post('/add-to-results', saveResults);
+
+// app.post('/create-search', searchGeocode);
 // app.post('/shop-favorites', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
-// app.post('/add-to-databse', addShop);
+// app.post('/show-shop', showShop);
 
-app.delete('/delete-favorite/:shop_id', deleteFav);
 
-// Catch-all
-app.get('*', (request, response) => response.status(404).send('This route does not exist'));
+// ****Marry's code starts here*****
 
-// ERROR HANDLER
-function handleError(err, res) {
-  console.error(err);
-  if (res) res.status(500).send('Sorry, something went wrong');
-}
+function addUser(request, response) {
+  console.log('done!', request.body);
 
-// HELPER FUNCTIONS
 
-function getDataFromDB(sqlInfo) {
-  // Create a SQL Statement
-  let condition = '';
-  let values = [];
+  let {username} = request.body;
 
-  if (sqlInfo.searchQuery) {
-    condition = 'search_query';
-    values = [sqlInfo.searchQuery];
-  } else {
-    condition = 'location_id';
-    values = [sqlInfo.id];
-  }
+  username = username.toLowerCase();
 
-  let sql = `SELECT * FROM ${sqlInfo.endpoint}s WHERE ${condition}=$1;`;
 
-  // Get the Data and Return
-  try { return client.query(sql, values); }
-  catch (error) { handleError(error); }
-}
+  console.log('this is the user name: ', username);
 
-function saveDataToDB(sqlInfo) {
-  // Create the parameter placeholders
-  let params = [];
+  let userExist = 'SELECT * FROM users WHERE username = $1;';
 
-  for (let i = 1; i <= sqlInfo.values.length; i++) {
-    params.push(`$${i}`);
-  }
+  let valuesOne = [username];
 
-  let sqlParams = params.join();
+  client.query(userExist, valuesOne)
+    .then(results => {
+      if(results.rows.length > 0) {
+        response.redirect('login');
+        console.log('this username exist!!!');
+      } else{
+        let SQL= 'INSERT INTO users (username) VALUES ($1);';
+        let values = [username]
 
-  let sql = '';
-  if (sqlInfo.searchQuery) {
-    // location
-    sql = `INSERT INTO ${sqlInfo.endpoint}s (${sqlInfo.columns}) VALUES (${sqlParams}) RETURNING ID;`;
-  } else {
-    // all other endpoints
-    sql = `INSERT INTO ${sqlInfo.endpoint}s (${sqlInfo.columns}) VALUES (${sqlParams});`;
-  }
-
-  // save the data
-  try { return client.query(sql, sqlInfo.values); }
-  catch (err) { handleError(err); }
-}
-
-function searchGeocode (request, response) {
-  let sqlInfo = {
-    searchQuery: request.query.data,
-    endpoint: 'location'
-  };
-
-  getDataFromDB(sqlInfo)
-    .then(result => {
-      if (result.rowCount > 0) {
-        response.send(result.rows[0]);
-      } else {
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
-
-        superagent.get(url)
+        client.query(SQL, values)
           .then(result => {
-            if (!result.body.results.length) { throw 'NO LOCATION DATA'; }
-            else {
-              let location = new Location(sqlInfo.searchQuery, result.body.results[0]);
-
-              sqlInfo.columns = Object.keys(location).join();
-              sqlInfo.values = Object.values(location);
-
-              saveDataToDB(sqlInfo)
-                .then(data => {
-                  location.id = data.rows[0].id;
-                  response.send(location);
-                });
-            }
+            console.log(result);
+            response.redirect('/')
           })
           .catch(error => handleError(error, response));
       }
-    });
+    })
+    .catch(error => handleError(error, response));
 }
 
-//Deletes restaurant from DB
-function deleteFav (request, response) {
-  const SQL = 'DELETE FROM favorites WHERE id=$1;';
-  const value = [request.params.place_id];
-  client.query (SQL, value)
-    .then(response.redirect('/shop-favorites'))
+
+function getLogIn(request, response){
+  response.render('login');
+}
+
+function showForm(request, response){
+  response.render('signup');
+}
+
+function allowIn(request, response) {
+  let username = request.body;
+  let check = 'SELECT * FROM users WHERE username = $1;';
+  let value = [username];
+
+  client.query(check, value)
+    .then(results => {
+      console.log(results);
+      if(results.rowCount !== 0 && results.rows[0].username === username) {
+        response.redirect('/pages/index');
+        console.log('success!!!');
+      } else {
+        response.redirect('signup');
+        console.log('this route failed');
+      }
+    })
+    .catch(error => handleError(error, response));
+}
+
+
+// function signUp(request, response) {
+//   response.render('signUp.ejs', {users: request.flash('signUpUsers')})
+// };
+
+// ****Marry's code ends here***
+
+
+// HELPER FUNCTIONS
+// Landing page... going to change--
+// this calls us to the search initializing page
+function spinTheWheel(request, response) {
+  response.render('pages/index');
+}
+
+//Rendering About Us page
+function aboutUs (request, response) {
+  response.render('pages/about-us');
+}
+
+function howTo (request, response) {
+  response.render('pages/how-to');
+}
+
+// Our search, so far ❤️
+function getPlaces(request, response) {
+
+  let tempArr = [];
+
+  // console.log('hey requst',request.body.placenearby);
+  // console.log('💰',request.body.budget);
+
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
+
+  // console.log(url);
+
+
+  superagent.get(url)
+    .then(result => {
+      // console.log(result.body.results[0]);
+      const location = new Location(request.body, result);
+      // response.send(location);
+
+      console.log('location is', location);
+
+
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=500&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
+      console.log(nearbyurl);
+      // DON'T FORGET TO CHANGE DISTANCE PARAM BEFORE LAUNCH! SHORTENED TO MAKE FOR EASIER READING WHILE TESTING
+
+      superagent.get(nearbyurl)
+        .then(result => {
+          // console.log('💰',request.body.budget);
+
+          const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
+
+          Place.prototype.toString = function placeString() {
+            return '' + this.place_id;
+          }
+          // console.log('🥡nearbyPlaces is an array of plac_id objs',nearbyPlaces);
+
+          nearbyPlaces.forEach(element => {
+            // console.log('element.place_id', element.toString());
+
+            let placeKey = element.toString();
+            // console.log(placeKey);
+
+            const detailurl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeKey}&fields=formatted_address,name,photo,place_id,type,url,vicinity,website,formatted_phone_number,price_level,rating,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
+
+            superagent.get(detailurl)
+            .then(result => {
+              // console.log('the result you are mapping is ',result.body.result);
+
+              // console.log('🙊',Object.values(result.body.result));
+              const details = new Details(result.body.result);
+              // console.log('🐋',details);
+              // (results => {
+              //   console.log(result.body);
+              //   return saveResults(result.body);
+              // })
+
+              tempArr.push(details);
+
+              // return Object.values(result.body.result);
+              // the result is an object, you can't map. we need to use an object method here, whoops!
+              // const placeDetails = result.body.result.map(placeid => new Details(placeid));
+              // console.log('details!🦑',placeDetails);
+            })
+          });
+
+        })
+    })
+    // .then(results => console.log(results, '{ searchResults: results }'))
+    
+    .catch(err => handleError(err, response));
+    console.log(tempArr)
+}
+
+//----Richard's code starts here--------------------
+
+// Add search result details to a temp table in the database to be read for 1) selecting a result at random to display on the page and 2) to save the random result to the restaurant (history) table.
+
+
+function saveResults(request, response) {
+
+  let { name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours } = request.body;
+
+  let SQL = 'INSERT INTO temp (name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
+  
+  let values = [name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours];
+
+  return client.query(SQL, values)
+    .then(result => response.redirect('/add-to-results'))
     .catch(err => handleError(err, response));
 }
 
-//Constructor Functions
-function Location (query, location) {
-  this.search_query = query;
-  this.formatted_query = location.formatted_address;
-  this.latitude = location.geometry.location.lat;
-  this.longitude = location.geometry.location.lng;
+// Add a shop (restaurant) to restaurants table when it gets "randomly" selected from the temp table of search results.
+// If both saveResults and addShop functions are used, refactor to use same SQL code, time permitting.
+
+function addShop(request, response) {
+
+  let { name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours } = request.body;
+
+  let SQL = 'INSERT INTO retaurants (name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
+
+  let values = [name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours];
+
+  return client.query(SQL, values)
+    .then(result => response.redirect('/add-to-database'))
+    .catch(err => handleError(err, response));
+
 }
+
+// Select a random restaurant to 1) display on the page and 2) save to history/favorites
+
+// function showShop(request, response) {
+//     .then(shelves => {
+//       let SQL = 'SELECT * FROM temp WHERE id=$1;';
+//       let values = [request.params.id];
+//       client.query(SQL, values)
+//         .then(result => response.render('show-shop', { temp: place_id,  }))
+//         .catch(err => handleError(err, response));
+//     })
+// }
+
+// -------Richard's code ends here-------------------
+
+// geocode constructor
+function Location(query, res) {
+  this.search_query = query;
+  this.formatted_query = res.body.results[0].formatted_address;
+  this.latitude = res.body.results[0].geometry.location.lat;
+  this.longitude = res.body.results[0].geometry.location.lng;
+}
+// placemaker
+function Place(nearby) {
+  this.place_id = nearby.place_id;
+
+}
+
+// details
+function Details(placeid) {
+  this.name = placeid.name;
+  this.place_id = placeid.place_id;
+  this.price = placeid.price_level;
+  this.rating = placeid.rating;
+  this.photo_ref = placeid.photos[0].photo_reference;
+  this.photo = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${placeid.photos[0].photo_reference}&key=${process.env.GOOGLE_API_KEY}`;
+  this.website = placeid.website;
+  this.formatted_address = placeid.formatted_address;
+  this.quick_address = placeid.vicinity;
+  this.formatted_phone_number = placeid.formatted_phone_number;
+  this.hours = placeid.opening_hours.weekday_text;
+
+  // formatted_address,
+  // name,
+  // permanently_closed,
+  // photo,
+  // place_id,
+  // type,
+  // url,
+  // vicinity,
+  // website,
+  // formatted_phone_number,
+  // price_level,
+  // rating,
+  // opening_hours
+}
+
+
+app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
+
+// Error Handler
+// function handleError(err, response) {
+//   console.error(err);
+//   if (response) response.status(500).send('Sorry something went wrong');
+// }
+
+function handleError(error, response) {
+ console.log(error);
+ response.render('error', { error: error });
+}
+
+// Shuffle an array javascript
+// function shuffle ( array ) { array . sort ( ( ) => Math . random ( ) - 0.5 ) ; } let arr = [ 1 , 2 , 3 ] ; shuffle ( arr ) ; alert ( arr ) ; That somewhat works, because Math.random() - 0.5 is a random number that may be positive or negative, so the sorting function reorders elements randomly.
