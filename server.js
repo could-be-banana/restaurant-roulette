@@ -160,6 +160,7 @@ function getPlaces(request, response) {
             superagent.get(detailurl)
             .then(result => {
               const placeDetails= new Details(result.body.result);
+
               // the result is an object, you can't map. we need to use an object method here, whoops!
               // const placeDetails = result.body.result.map(placeid => new Details(placeid));
               // console.log('details!🦑',placeDetails);
