@@ -15,26 +15,26 @@
       <h1>Search Results</h1>
   
       <ul class="add-form">
-        <% searchResults.forEach(shop => { %>
+        <% searchResults.forEach(placeDetails => { %>
           <li>
-            <img src=<%= shop.photo %> alt=Cover for <%= shop.name %> />
-            <h2><%= shop.name %></h2>
-            <h3><%= shop.photo %></h3>
-            <p><%= shop.website %></p>
-            <p><%= shop.quick_address %></p>
-            <p><%= shop.formatted_phone_number %></p>
-            <p><%= shop.hours %></p>
-            <p><%= shop.price %></p>
-            <p><%= shop.rating %></p>
+            <img src=<%= placeDetails.photo %> alt=Cover for <%= placeDetails.name %> />
+            <h2><%= placeDetails.name %></h2>
+            <h3><%= placeDetails.photo %></h3>
+            <p><%= placeDetails.website %></p>
+            <p><%= placeDetails.quick_address %></p>
+            <p><%= placeDetails.formatted_phone_number %></p>
+            <p><%= placeDetails.hours %></p>
+            <p><%= placeDetails.price %></p>
+            <p><%= placeDetails.rating %></p>
             <button type="button">Select this Restaurant</button>
     
             <form action="/add-to-database" method="post" class="hidden">
-              <input type="text" name="title" value="<%= shop.title %>" />
-              <input type="text" name="author" value="<%= shop.author %>" />
-              <input type="text" name="isbn" value="<%= shop.isbn %>" />
-              <input type="textarea" name="description" value="<%= shop.description %>" />
-              <input type="text" name="bookshelf" value="<%= shop.bookshelf %>" />
-              <input type="text" name="image_url" value="<%= shop.image_url %>" />
+              <input type="text" name="title" value="<%= placeDetails.title %>" />
+              <input type="text" name="author" value="<%= placeDetails.author %>" />
+              <input type="text" name="isbn" value="<%= placeDetails.isbn %>" />
+              <input type="textarea" name="description" value="<%= placeDetails.description %>" />
+              <input type="text" name="bookshelf" value="<%= placeDetails.bookshelf %>" />
+              <input type="text" name="image_url" value="<%= placeDetails.image_url %>" />
               <button type="button">Hide Form</button>
               <button type="submit">Save to Database</button>
             </form>
