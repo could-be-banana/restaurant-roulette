@@ -14,8 +14,24 @@
   </header>
   <main>
     <h1>Sign Up Here</h1>
-    <div class="signup-container">
-      <form class="form-signup" action="/signup" method="post">
+
+    <!-- <section class="controls">
+      <div class="signup-container">
+        <form class="form-signup" action="/signup" method="post">
+          <input type="text" name="username" class="form-control" placeholder="Username" required>
+          <button type="submit">Sign Up</button>
+        </form>
+      </div>
+      <div class="login-container">
+        <a href="/"><em>Login</em></a>
+      </div>
+    </section>
+ -->
+    
+      <form class="form-2" action="/signup" method="post">
+        <h1><span class="sign-up">signup</span></h1>
+        <p class="float"></p>
+        <label for="sign-up"><i class="icon-user"></i>sign up here</label>
         <input type="text" name="username" class="form-control" placeholder="Username" required>
         <button type="submit">Sign Up</button>
       </form>
@@ -23,11 +39,13 @@
     <div class="login-container">
       <a href="/">Login</a>
     </div>
+
   </main>
 
 
   <footer>
-  <%- include('partials/footer')%>
+    <%- include('partials/footer')%>
   </footer>
 </body>
+
 </html>

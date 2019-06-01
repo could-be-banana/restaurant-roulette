@@ -27,8 +27,10 @@
                 <p><%= placeDetails.hours %></p>
                 <p>Price:  <%= placeDetails.price %></p>
                 <p>Rating: <%= placeDetails.rating %></p>
-                <button type="button">Try Another Place</button>
-                <form action="/add-to-database" method="post" class="hidden" id="save-shop">
+                
+                <form action="/add-to-database" method="post" id="save-shop">
+                  <button type="submit">Try Another Place</button>
+                  <div class="save-shop">
                   <input type="text" name="name" value="<%= placeDetails.name %>" />
                   <input type="text" name="place_id" value="<%= placeDetails.place_id %>" />
                   <input type="text" name="price" value="<%= placeDetails.price %>" />
@@ -40,8 +42,7 @@
                   <input type="text" name="quick_address" value="<%= placeDetails.quick_address %>" />
                   <input type="text" name="formatted_phone_number" value="<%= placeDetails.formatted_phone_number %>" />
                   <input type="text" name="hours" value="<%= placeDetails.hours %>" />
-                  <button type="button">Hide Form</button>
-	                <button type="submit">Save to Database</button>
+                </div>
                 </form>
               </li>
             <% }) %>

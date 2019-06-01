@@ -8,7 +8,6 @@ CREATE TABLE users (
   username VARCHAR(10) UNIQUE NOT NULL
 );
  
-
 CREATE TABLE restaurants (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255),
