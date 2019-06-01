@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Today I'm Eating...</title>
   <%- include('../partials/head') %>
 </head>
 
@@ -12,40 +13,44 @@
     <%- include('../partials/nav') %>
   </header>
   <main>
-      <h1>Search Results</h1>
-  
-      <ul class="add-form">
-        <% searchResults.forEach(shop => { %>
-          <li>
-            <img src=<%= shop.photo %> alt=Cover for <%= shop.name %> />
-            <h2><%= shop.name %></h2>
-            <h3><%= shop.photo %></h3>
-            <p><%= shop.website %></p>
-            <p><%= shop.quick_address %></p>
-            <p><%= shop.formatted_phone_number %></p>
-            <p><%= shop.hours %></p>
-            <p><%= shop.price %></p>
-            <p><%= shop.rating %></p>
-            <button type="button">Select this Restaurant</button>
-    
-            <form action="/add-to-database" method="post" class="hidden">
-              <input type="text" name="title" value="<%= shop.title %>" />
-              <input type="text" name="author" value="<%= shop.author %>" />
-              <input type="text" name="isbn" value="<%= shop.isbn %>" />
-              <input type="textarea" name="description" value="<%= shop.description %>" />
-              <input type="text" name="bookshelf" value="<%= shop.bookshelf %>" />
-              <input type="text" name="image_url" value="<%= shop.image_url %>" />
-              <button type="button">Hide Form</button>
-              <button type="submit">Save to Database</button>
-            </form>
-          </li>
-        <% }) %>
-      </ul>
+      <section class="controls">
+          <h1>Search Results</h1>
+      
+          <ul class="add-form">
+            <% searchResults.forEach(placeDetails => { %>
+              <li>
+                <img src="<%= placeDetails.photo %>"" alt=Cover for <%= placeDetails.name %> />
+                <h2><%= placeDetails.name %></h2>
+                <p><a href="<%= placeDetails.website %>"><%= placeDetails.website %></a></p>
+                <p><%= placeDetails.quick_address %></p>
+                <p><%= placeDetails.formatted_phone_number %></p>
+                <p><%= placeDetails.hours %></p>
+                <p>Price:  <%= placeDetails.price %></p>
+                <p>Rating: <%= placeDetails.rating %></p>
+                <button type="button">Try Another Place</button>
+                <form action="/add-to-database" method="post" class="hidden" id="save-shop">
+                  <input type="text" name="name" value="<%= placeDetails.name %>" />
+                  <input type="text" name="place_id" value="<%= placeDetails.place_id %>" />
+                  <input type="text" name="price" value="<%= placeDetails.price %>" />
+                  <input type="text" name="rating" value="<%= placeDetails.rating %>" />
+                  <input type="text" name="photo_ref" value="<%= placeDetails.photo_ref %>" />
+                  <input type="text" name="photo" value="<%= placeDetails.photo %>" />
+                  <input type="text" name="website" value="<%= placeDetails.website %>" />
+                  <input type="text" name="formatted_address" value="<%= placeDetails.formatted_address %>" />
+                  <input type="text" name="quick_address" value="<%= placeDetails.quick_address %>" />
+                  <input type="text" name="formatted_phone_number" value="<%= placeDetails.formatted_phone_number %>" />
+                  <input type="text" name="hours" value="<%= placeDetails.hours %>" />
+                </form>
+              </li>
+            <% }) %>
+          </ul>
+        </section>
     </main>
-  <footer>
-    <%- include('../partials/footer') %>
-
-  </footer>
-</body>
-
-</html>
+    <footer>
+      <%- include('../partials/footer') %>
+  
+    </footer>
+  </body>
+  
+  </html>
+  

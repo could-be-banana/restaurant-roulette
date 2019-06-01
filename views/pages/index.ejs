@@ -12,41 +12,23 @@
     <%- include('../partials/nav') %>
   </header>
   <main>
-    <div id="roulette"></div>
-
+    <h1>Spin Me!</h1>
     <div class="controls">
-        <p>Don't know what to eat? Send burrito-cat your location and budget and let her do the work!</p>
-       
-  
-        <p>name your price!</p>
+        <p><em>Don't know what to eat?</em><br><br>Send burrito-cat your location and budget and let her do the work!</p>
         <form action="/placeSearch" method="post">
-          <p>Location here:</p>
-          <input type="text" placeholder="set location here" name="placenearby" required></input>
+          <button type="submit" id="roulette"></button>
+          <p>Set Your Location:</p>
+          <input type="text" placeholder="street address" name="placenearby" required></input>
+          <p>Set Your Price ($ - $$$$):</p>
           <input list="budget" name="budget">
           <datalist id="budget">
-            <option value="1">
+            <option value="1" placeholder="$">
             <option value="2">
             <option value="3">
             <option value="4">
           </datalist>
-          <button type="submit">submit</button>
         </form>
-<!--       
-      <form action="/placeSearch" method="post">
-        <p>Location here:</p>
-      <input type="text" placeholder="set location here" name="placenearby" required></input>
-        <p>name your price!</p>
-        <input list="budget" name="budget">
-        <datalist id="budget">
-          <option value="$">
-          <option value="$-$$">
-          <option value="$$-$$$">
-          <option value="$$$-$$$$">
-        </datalist>
-        <input type="submit" name="placenearby">
-      </form>
-    </div> -->
-   
+   </div>
   </main>
   <footer>
     <%- include('../partials/footer') %>

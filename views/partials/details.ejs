@@ -1,23 +1,36 @@
-<!-- Maron -->
-<section class="detail">
-  <section class="detail">
-    <h2><%= locations.name %> </h2>
-    <img src=<%=locations.image_url %>>
-    <p><%= locations.image_url %></p>
-    <p><%= locations.lat %></p>
-    <p><%= locations.lat %></p>
-    <p><%= locations.formatted_address %></p>
-    <button class="show-form">Update details</button>
-  </section>
+<section class="controls">
+    <h1>Search Results</h1>
 
-  <section class="detail-form">
+    <ul class="add-form">
+      <% searchResults.forEach(placeDetails => { %>
+        <li>
+          <img src="<%= placeDetails.photo %>"" alt=Cover for <%= placeDetails.name %> />
+          <h2><%= placeDetails.name %></h2>
+          <p><a href="<%= placeDetails.website %>"><%= placeDetails.website %></a></p>
+          <p><%= placeDetails.quick_address %></p>
+          <p><%= placeDetails.formatted_phone_number %></p>
+          <p><%= placeDetails.hours %></p>
+          <p>Price:  <%= placeDetails.price %></p>
+          <p>Rating: <%= placeDetails.rating %></p>
+          <button type="button">Select this Restaurant</button>
   
-      <form action="/locations/<%=locations.id %>" method="post">
-        <input type="hidden" name="_method" value="PUT">
-        <input name="name" class="text-input"  name="search" value="<%= locations.name %>" >
-        <input name="latitude" class="text-input"  name="search" value="<%= locations.lat %>" >
-        <input name="longtiude" class="text-input"  name="search" value="<%= locations.lng %>" >
-        <input name="image_url" class="text-input"  name="search" value="<%= locations.image_url %>" >
-        <button id="add-form-submit" type="submit">Add to Database</button>
-      </form>
+          <form action="/add-to-database" method="post" class="hidden">
+            <input type="text" name="name" value="<%= placeDetails.name %>" />
+            <input type="text" name="place_id" value="<%= placeDetails.place_id %>" />
+            <input type="text" name="price" value="<%= placeDetails.price %>" />
+            <input type="text" name="rating" value="<%= placeDetails.rating %>" />
+            <input type="text" name="photo_ref" value="<%= placeDetails.photo_ref %>" />
+            <input type="text" name="photo" value="<%= placeDetails.photo %>" />
+            <input type="text" name="website" value="<%= placeDetails.website %>" />
+            <input type="text" name="formatted_address" value="<%= placeDetails.formatted_address %>" />
+            <input type="text" name="quick_address" value="<%= placeDetails.quick_address %>" />
+            <input type="text" name="formatted_phone_number" value="<%= placeDetails.formatted_phone_number %>" />
+            <input type="text" name="hours" value="<%= placeDetails.hours %>" />
+
+            <button type="button">Hide Form</button>
+            <button type="submit">Save to Database</button>
+          </form>
+        </li>
+      <% }) %>
+    </ul>
   </section>

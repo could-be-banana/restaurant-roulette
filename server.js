@@ -28,6 +28,16 @@ app.listen(PORT, () => console.log(`Loud and clear on ${PORT}`));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// Method override
+
+app.use(method(function (request) {
+  if (request.body && typeof request.body === 'object' && '_method' in request.body) {
+    let method = request.body._method;
+    delete request.body._method;
+    return method;
+  }
+}));
+
 // ejs!
 app.set('view engine', 'ejs');
 //look into app.set view options
@@ -47,7 +57,7 @@ app.post('/add-to-database', addShop);
 app.post('/add-to-results', saveResults);
 
 // app.post('/create-search', searchGeocode);
-// app.post('/shop-favorites', showFavs);
+app.get('/pages/history.ejs', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/show-shop', showShop);
 
@@ -58,7 +68,7 @@ function addUser(request, response) {
   console.log('done!', request.body);
 
 
-  let {username} = request.body;
+  let { username } = request.body;
 
   username = username.toLowerCase();
 
@@ -71,11 +81,11 @@ function addUser(request, response) {
 
   client.query(userExist, valuesOne)
     .then(results => {
-      if(results.rows.length > 0) {
+      if (results.rows.length > 0) {
         response.redirect('login');
         console.log('this username exist!!!');
-      } else{
-        let SQL= 'INSERT INTO users (username) VALUES ($1);';
+      } else {
+        let SQL = 'INSERT INTO users (username) VALUES ($1);';
         let values = [username]
 
         client.query(SQL, values)
@@ -90,11 +100,11 @@ function addUser(request, response) {
 }
 
 
-function getLogIn(request, response){
+function getLogIn(request, response) {
   response.render('login');
 }
 
-function showForm(request, response){
+function showForm(request, response) {
   response.render('signup');
 }
 
@@ -106,7 +116,7 @@ function allowIn(request, response) {
   client.query(check, value)
     .then(results => {
       console.log(results);
-      if(results.rowCount !== 0 && results.rows[0].username === username) {
+      if (results.rowCount !== 0 && results.rows[0].username === username) {
         response.redirect('/pages/index');
         console.log('success!!!');
       } else {
@@ -133,87 +143,47 @@ function spinTheWheel(request, response) {
 }
 
 //Rendering About Us page
-function aboutUs (request, response) {
+function aboutUs(request, response) {
   response.render('pages/about-us');
 }
 
-function howTo (request, response) {
+function howTo(request, response) {
   response.render('pages/how-to');
 }
 
+// function history(request,response) {
+//   response.render('pages/history');
+// }
+// ****************************************
 // Our search, so far ❤️
 function getPlaces(request, response) {
-
-  let tempArr = [];
-
-  // console.log('hey requst',request.body.placenearby);
-  // console.log('💰',request.body.budget);
-
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
-
-  // console.log(url);
-
-
   superagent.get(url)
     .then(result => {
-      // console.log(result.body.results[0]);
       const location = new Location(request.body, result);
-      // response.send(location);
-
-      console.log('location is', location);
-
 
       const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=500&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
-      console.log(nearbyurl);
-      // DON'T FORGET TO CHANGE DISTANCE PARAM BEFORE LAUNCH! SHORTENED TO MAKE FOR EASIER READING WHILE TESTING
 
       superagent.get(nearbyurl)
-        .then(result => {
-          // console.log('💰',request.body.budget);
-
+        .then(result => { 
           const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
-
-          Place.prototype.toString = function placeString() {
-            return '' + this.place_id;
-          }
-          // console.log('🥡nearbyPlaces is an array of plac_id objs',nearbyPlaces);
-
+          Place.prototype.toString = function placeString(){return '' + this.place_id;};
+          let arr=[];
           nearbyPlaces.forEach(element => {
-            // console.log('element.place_id', element.toString());
-
             let placeKey = element.toString();
-            // console.log(placeKey);
-
-            const detailurl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeKey}&fields=formatted_address,name,photo,place_id,type,url,vicinity,website,formatted_phone_number,price_level,rating,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
-
+            const detailurl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeKey}&fields=formatted_address,name,permanently_closed,photo,place_id,type,url,vicinity,website,formatted_phone_number,price_level,rating,opening_hours&key=${process.env.GOOGLE_API_KEY}`;
             superagent.get(detailurl)
             .then(result => {
-              // console.log('the result you are mapping is ',result.body.result);
-
-              // console.log('🙊',Object.values(result.body.result));
-              const details = new Details(result.body.result);
-              // console.log('🐋',details);
-              // (results => {
-              //   console.log(result.body);
-              //   return saveResults(result.body);
-              // })
-
-              tempArr.push(details);
-
-              // return Object.values(result.body.result);
-              // the result is an object, you can't map. we need to use an object method here, whoops!
-              // const placeDetails = result.body.result.map(placeid => new Details(placeid));
-              // console.log('details!🦑',placeDetails);
+              const placeDetails= new Details(result.body.result);
+              arr.push(placeDetails);
+              response.render('pages/show-results.ejs', { searchResults: arr });
             })
           });
-
         })
     })
-    // .then(results => console.log(results, '{ searchResults: results }'))
-    
     .catch(err => handleError(err, response));
-    console.log(tempArr)
 }
+
 
 //----Richard's code starts here--------------------
 
@@ -225,7 +195,7 @@ function saveResults(request, response) {
   let { name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours } = request.body;
 
   let SQL = 'INSERT INTO temp (name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
-  
+
   let values = [name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours];
 
   return client.query(SQL, values)
@@ -240,27 +210,46 @@ function addShop(request, response) {
 
   let { name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours } = request.body;
 
-  let SQL = 'INSERT INTO retaurants (name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
+  let SQL = 'INSERT INTO restaurants (name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
 
   let values = [name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours];
 
   return client.query(SQL, values)
-    .then(result => response.redirect('/add-to-database'))
+    .then(response.render('pages/index'))
     .catch(err => handleError(err, response));
 
 }
 
 // Select a random restaurant to 1) display on the page and 2) save to history/favorites
 
-// function showShop(request, response) {
-//     .then(shelves => {
-//       let SQL = 'SELECT * FROM temp WHERE id=$1;';
-//       let values = [request.params.id];
-//       client.query(SQL, values)
-//         .then(result => response.render('show-shop', { temp: place_id,  }))
-//         .catch(err => handleError(err, response));
+// function showFavs(request, response) {
+//   const SQL = `SELECT * FROM restaurants;`;
+
+//   return client.query(SQL)
+//     .then(shopHistory => {
+//       console.log('shopHistory', shopHistory);
+//       response.render('pages/history', {
+//         historyOfRestaurants: shopHistory.rows,
+//         numberOfRestaurants: shopHistory.rowCount
+//       })
 //     })
+//     .catch(err => handleError(err, response));
 // }
+
+function showFavs(request, response) {
+  let SQL = 'SELECT * FROM restaurants;';
+
+  return client.query(SQL)
+    .then(results => {
+      console.log(results.rows);
+      if (results.rows.rowCount === 0) {
+        response.render('pages/index');
+      } else {
+        response.render('pages/history', { results: results.rows})
+      }
+    })
+    .catch(err => handleError(err, response));
+}
 
 // -------Richard's code ends here-------------------
 
@@ -290,20 +279,6 @@ function Details(placeid) {
   this.quick_address = placeid.vicinity;
   this.formatted_phone_number = placeid.formatted_phone_number;
   this.hours = placeid.opening_hours.weekday_text;
-
-  // formatted_address,
-  // name,
-  // permanently_closed,
-  // photo,
-  // place_id,
-  // type,
-  // url,
-  // vicinity,
-  // website,
-  // formatted_phone_number,
-  // price_level,
-  // rating,
-  // opening_hours
 }
 
 
@@ -316,8 +291,8 @@ app.get('*', (request, response) => response.status(404).send('Nothing to see he
 // }
 
 function handleError(error, response) {
- console.log(error);
- response.render('error', { error: error });
+  console.log(error);
+  response.render('error', { error: error });
 }
 
 // Shuffle an array javascript
