@@ -46,15 +46,14 @@ app.post('/signup', addUser);
 app.get('/pages/index.ejs', spinTheWheel);
 app.get('/pages/about-us.ejs', aboutUs);
 app.get('/pages/how-to.ejs', howTo);
+app.get('/pages/history.ejs', showFavs);
 app.post('/placeSearch', getPlaces);
 
 app.post('/add-to-database', addShop);
 app.post('/add-to-results', saveResults);
 
-// app.post('/create-search', searchGeocode);
-app.get('/pages/history.ejs', showFavs);
-// app.post('/shop-details/:shop_id', showShopDetails);
-// app.post('/show-shop', showShop);
+app.delete('/shop-favorites/:id', deleteFavs);
+
 
 
 // ****Marry's code starts here*****
@@ -205,6 +204,15 @@ function showFavs(request, response) {
       }
     })
     .catch(err => handleError(err, response));
+}
+
+function deleteFavs (request, response) {
+  const SQL = 'DELETE FROM restaurants WHERE id=$1;';
+  const value = [request.params.id];
+  console.log(value[0]);
+  client.query(SQL, value)
+    .then(response.redirect('/pages/history.ejs'))
+    .catch(error => handleError(error, response));
 }
 
 // geocode constructor

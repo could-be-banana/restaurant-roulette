@@ -9,11 +9,9 @@ function myFunction() {
   }
 }
 
-
 $(document).ready(function () {
   $('.save-shop').hide();
 })
-
 
 let $spin = $('#roulette');
 $spin.on('click', function () {
