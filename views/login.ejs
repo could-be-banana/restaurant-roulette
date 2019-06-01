@@ -13,10 +13,11 @@
     <%- include('partials/nav') %>
   </header>
   <main>
+
     <h1>Login here!</h1>
     <section class="controls">
     <div class="login-contanier">
-      <form action="/login" method="post" class='form-login-in'>
+      <form action="/login" method="post" class=form-2'>
         <input type="text" name="username" class="form-control" placeholder="username" requried autofocus>
         <p>remember me</p>
         <input type="checkbox" name="remember" class="form-control" placeholder="Remember me">
@@ -28,7 +29,28 @@
     <div class="signup-container">
       <a href="/signup"><em>Sign Up!</em></a>
     </div>
-  </section>
+
+  <h1>Login here!</h1>
+
+ 
+    <form action="/login" method="post" class='form-2'>
+      <h1><span class="log-in">Log in</span> </h1>
+      <p class="float">
+          <label for="login"><i class="icon-user"></i>Username</label>
+      <input type="text" name="username" class="form-control" placeholder="username" requried autofocus>
+      <input type="checkbox" name="remember" class="form-control" placeholder="Remember me">
+    </p>
+      <button type="submit">LogIn</button>
+      
+    </form>
+
+
+  </div>
+  <div class="signup-container">
+    <a href="signup">sign up!</a>
+  </div>
+
+
   </main>
 
 
