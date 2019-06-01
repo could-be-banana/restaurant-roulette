@@ -82,7 +82,7 @@ function addUser(request, response) {
   client.query(userExist, valuesOne)
     .then(results => {
       if (results.rows.length > 0) {
-        response.redirect('login');
+        response.redirect('signup');
         console.log('this username exist!!!');
       } else {
         let SQL = 'INSERT INTO users (username) VALUES ($1);';
@@ -117,10 +117,10 @@ function allowIn(request, response) {
     .then(results => {
       console.log(results);
       if (results.rowCount !== 0 && results.rows[0].username === username) {
-        response.redirect('/pages/index');
+        response.redirect('login');
         console.log('success!!!');
       } else {
-        response.redirect('signup');
+        response.render('pages/index');
         console.log('this route failed');
       }
     })
