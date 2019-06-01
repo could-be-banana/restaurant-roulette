@@ -6,6 +6,27 @@ html, body {
   background: #fff;
 }
 
+body {
+  font-family: 'Patrick Hand', cursive;
+  color:#370926;
+  font-size:16px;
+  display: flex;
+  flex-direction: column;
+}
+
+a{
+  text-decoration: none;
+  /* background-color: #ffba49; */
+  color:#370926;
+  font-weight: bolder;
+}
+
+a:hover{
+  text-decoration: underline;
+  /* background-color: #370926; */
+  color: #ffba49;
+}
+
 em{
   font-size:1.5em;
   font-weight:boldest;
@@ -30,15 +51,21 @@ p{
   margin:10px;
 }
 
-body {
-  font-family: 'Patrick Hand', cursive;
-/*   font-family: 'Luckiest Guy', cursive; */
-/*   font-family: 'Ubuntu Mono', monospace; */
-/*   font-family:futura; */
-  color:#370926;
-  font-size:16px;
-  display: flex;
-  flex-direction: column;
+
+button{
+  border: none;
+  border-radius: none;
+  background: #ffba49;
+  color: #370926;
+  padding: 5px 15px;
+  transition: 250ms all;
+  cursor: pointer;
+  margin: 10px;
+}
+  
+button:hover{
+  background-color: #370926;
+  color: #ffba49;
 }
 
 .nav a:not(:first-child){
@@ -49,7 +76,6 @@ body {
 .nav{
   overflow: hidden;
   background-color: #1c0118;
-  width: 100%;
 }
 
 .nav a {
@@ -66,9 +92,6 @@ body {
     font-size: 22px;
 }
 
-/* .menu {
-  background-color: #6bd425;
-} */
 
 .nav .icon {
   display: none;
@@ -82,7 +105,7 @@ body {
 
 
 
-@media(max-width: 725px) {
+@media screen and (min-width:300px) and (max-width: 768px){
   .nav a:not(:first-child){
     display: none;
   }
@@ -91,7 +114,10 @@ body {
     display: block;
   }
 
-  .nav.responsive {position: relative;}
+  .nav.responsive {
+    position: relative;
+  }
+
   .nav.responsive .icon {
     position: absolute;
     right: 0;
@@ -117,6 +143,29 @@ body {
     color:#1c0118;
   }
 
+  #roulette{
+    margin: 10px auto;
+    border-radius: 50%;
+    border:solid 2px #1c0118;
+    width: 100px;
+    height: 100px;
+    transition: 1s all;
+    background: url('http://67.media.tumblr.com/7592e6f5cf1efe81b2a07d8cea53a65b/tumblr_ndgd0mLqO21qhy6c9o3_400.gif');
+  }
+  
+  .spin{
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    transform: rotate(2160deg);
+  }
+  .duo{
+    width:70%;
+    margin: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 main{
@@ -135,14 +184,6 @@ main{
   background: url('http://67.media.tumblr.com/7592e6f5cf1efe81b2a07d8cea53a65b/tumblr_ndgd0mLqO21qhy6c9o3_400.gif');
 }
 
-/* #roulette{
-  margin: 20px auto;
-  border-radius: 50%;
-  width: 300px;
-  height: 300px;
-  transition: 1s all;
-} */
-
 .spin{
   border-radius: 50%;
   width: 300px;
@@ -153,14 +194,14 @@ main{
 .controls{
   margin: 20px auto;
   padding: 10px;
-  width:500px;
+  width:600px;
   text-align: center;
   color:#1c0118;
 }
 .how-to{
   margin: 20px auto;
   padding: 10px;
-  width:500px;
+  width:600px;
   color:#1c0118;
 }
 
@@ -168,6 +209,15 @@ input{
   margin: 10px auto;
   display:block;
   padding: 5px;
+  border: solid 2px #ffba49;
+}
+
+.duo{
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }
 
 .bio{
@@ -175,14 +225,23 @@ input{
   padding: 10px;
   display: flex;
   flex-direction: row;
-}
-
-.bio-pics{
-  order:0;
   
 }
-.bio-bits{
+
+.left{
+  order:0;
+  flex-grow: 1;
+  
+}
+
+.right{
   order:1;
+  flex-grow: 1;
+}
+
+.infographic{
+  width: 30%;
+  height: 30%;
 }
 
 footer{
@@ -194,7 +253,6 @@ footer{
   margin-top: 20px;
   flex-shrink: 0;
 }
-
 
 
 
@@ -286,3 +344,4 @@ footer{
     border-color: #BBB;
     outline: none; /* Remove Chrome's outline */
 }
+

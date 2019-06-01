@@ -10,7 +10,6 @@ CREATE TABLE users (
   username VARCHAR(10) UNIQUE NOT NULL
 );
  
-
 CREATE TABLE restaurants (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255),
@@ -25,22 +24,6 @@ CREATE TABLE restaurants (
   formatted_phone_number VARCHAR(255),
   hours VARCHAR(400)
 );
-
-CREATE TABLE temp (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255),
-  place_id VARCHAR(255),
-  price VARCHAR(255),
-  rating VARCHAR(255),
-  photo_ref VARCHAR(500),
-  photo VARCHAR(1000),
-  website VARCHAR(255),
-  formatted_address VARCHAR(255),
-  quick_address VARCHAR(255),
-  formatted_phone_number VARCHAR(255),
-  hours VARCHAR(400)
-);
-  
 
 CREATE TABLE favorites (
   id SERIAL PRIMARY KEY,
