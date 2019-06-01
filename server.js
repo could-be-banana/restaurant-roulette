@@ -253,20 +253,6 @@ function Details(placeid) {
   this.quick_address = placeid.vicinity;
   this.formatted_phone_number = placeid.formatted_phone_number;
   this.hours = placeid.opening_hours.weekday_text;
-
-  // formatted_address,
-  // name,
-  // permanently_closed,
-  // photo,
-  // place_id,
-  // type,
-  // url,
-  // vicinity,
-  // website,
-  // formatted_phone_number,
-  // price_level,
-  // rating,
-  // opening_hours
 }
 
 
