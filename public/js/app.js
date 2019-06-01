@@ -9,6 +9,7 @@ function myFunction() {
   }
 }
 
+
 $(document).ready(function () {
   $('#save-shop').hide();
 })
