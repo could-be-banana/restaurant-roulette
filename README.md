@@ -2,8 +2,9 @@
 
 ## Version
 
-1.0.0
+1.3.0
 
+Refer to Change Log below for details and prior releases.
 
 ## Team Members
 
@@ -23,8 +24,17 @@
 
 ## Project Description
 
+Restaurant roulette is mobile view application that generally a quick search places for ordering food based on mileage and price /budget range.
+We invite people to use application and give us feedback that is very valuable for us.
+
+Purpose: behind this project /app is making food ordering simple and fast, let user take some advantage of nearby search with in the budget range from their places. 
+
 
 ## Problem Domain
+
+Too many times we’ve been in the conundrum of too little time and too much decision…
+
+We wanted to create a solution for all those times you’ve been with your partner, friends or any group that the answer to “What do you want to eat?” has been, “Oh, I don’t know. Whatever is fine.”
 
 
 ## User Stories
@@ -63,18 +73,62 @@
 
 * Frameworks: Ajax, Javascript, and heroku
 
-* Packages: express, superagent, pg, and method-override
+* Packages: express, superagent, ejs, pg, and method-override
 
 
 ## User Instructions
 
+Step 1 - Enter your location. This will be used to find nearby establishments.
+
+Step 2 - Select the price range of the meal your are looking for: $ - cheap, $$ - mid-range, $$$ - expensive, $$$$ - very expensive.
+
+Step 3 - Click the roulette wheel! The wheel will shake once the search criteria have been entered to alert you that it is ready to find a restaurant for you.
+
+Once you spin the wheel, you will get the details for the restaurant that has been selected for you.
+
+If you do not like the selection, you can press the button beneath and another selection will be presented to you.
+
+If you really like the result, You can check it out in your saved history and press the favorites button to add the restaurant to your collection.
+
 
 ## API Endpoints
 
+The application uses four Google API endpoints:
+
+####Geocoding
+https://maps.googleapis.com/maps/api/geocode/outputFormat?parameters
+required paramters:  key, address or components
+
+####Nearby Search
+https://maps.googleapis.com/maps/api/place/nearbysearch/output?parameters
+required parameters:  key, location, radius
+
+####Place Details
+https://maps.googleapis.com/maps/api/place/details/output?parameters
+required parameters:  key, placeid
+
+####Place Photos
+https://maps.googleapis.com/maps/api/place/photo?parameters
+required parameters:  key, photoreference, maxheight or maxwidth
 
 ## Database Schemas
 
-* add links using [name here](website here)
+[Click Here to See Database Schema](https://github.com/could-be-banana/restaurant-roulette/blob/development/data/restaurant.sql)
+
+
+## Change Log
+
+1.3.0
+6/1/19 - Release for presentation.
+
+1.2.0
+5/31/19 - Deployment of a working prototype.  This release introduced the user to the experience of getting a local restaurant suggestion by specifying location and price parameters.  
+
+1.1.0
+5/30/19 - Status update.  This release introduced the database schema along with most of the functions to support the MVP. 
+
+1.0.0
+5/25/19 - Initial deployment of static pages to Heroku.  This release introduced styling and themes layered on top of the basic site architecture.
 
 
 ## Conflict Plan
