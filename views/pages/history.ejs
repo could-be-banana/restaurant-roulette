@@ -30,7 +30,7 @@
           <p>Rating: <%= placeDetails.rating %></p>
         </li>
       </ul>
-      <form action="/shop-favorites/<%placeDetails.id %>" method="post">
+      <form action="/shop-favorites/<%= placeDetails.id %>" method="post">
         <input type="hidden" name="_method" value="DELETE">
         <button type="submit" class="button">Delete Restaurant</button>
       </form>

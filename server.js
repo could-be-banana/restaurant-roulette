@@ -10,16 +10,12 @@ const pg = require('pg');
 const ejs = require('ejs');
 const method = require('method-override');
 
-
-
 //Application Setup
 const app = express();
 const PORT = process.env.PORT;
 const client = new pg.Client(process.env.DATABASE_URL);
 client.connect();
 client.on('err', err => console.error(err));
-
-
 
 // listen!
 app.listen(PORT, () => console.log(`Loud and clear on ${PORT}`));
@@ -29,7 +25,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // Method override
-
 app.use(method(function (request) {
   if (request.body && typeof request.body === 'object' && '_method' in request.body) {
     let method = request.body._method;
@@ -51,15 +46,14 @@ app.post('/signup', addUser);
 app.get('/pages/index.ejs', spinTheWheel);
 app.get('/pages/about-us.ejs', aboutUs);
 app.get('/pages/how-to.ejs', howTo);
+app.get('/pages/history.ejs', showFavs);
 app.post('/placeSearch', getPlaces);
 
 app.post('/add-to-database', addShop);
 app.post('/add-to-results', saveResults);
 
-// app.post('/create-search', searchGeocode);
-app.get('/pages/history.ejs', showFavs);
-// app.post('/shop-details/:shop_id', showShopDetails);
-// app.post('/show-shop', showShop);
+app.delete('/shop-favorites/:id', deleteFavs);
+
 
 
 // ****Marry's code starts here*****
@@ -82,7 +76,7 @@ function addUser(request, response) {
   client.query(userExist, valuesOne)
     .then(results => {
       if (results.rows.length > 0) {
-        response.redirect('login');
+        response.redirect('signup');
         console.log('this username exist!!!');
       } else {
         let SQL = 'INSERT INTO users (username) VALUES ($1);';
@@ -117,27 +111,17 @@ function allowIn(request, response) {
     .then(results => {
       console.log(results);
       if (results.rowCount !== 0 && results.rows[0].username === username) {
-        response.redirect('/pages/index');
+        response.redirect('login');
         console.log('success!!!');
       } else {
-        response.redirect('signup');
+        response.render('pages/index');
         console.log('this route failed');
       }
     })
     .catch(error => handleError(error, response));
 }
 
-
-// function signUp(request, response) {
-//   response.render('signUp.ejs', {users: request.flash('signUpUsers')})
-// };
-
-// ****Marry's code ends here***
-
-
 // HELPER FUNCTIONS
-// Landing page... going to change--
-// this calls us to the search initializing page
 function spinTheWheel(request, response) {
   response.render('pages/index');
 }
@@ -151,11 +135,6 @@ function howTo(request, response) {
   response.render('pages/how-to');
 }
 
-// function history(request,response) {
-//   response.render('pages/history');
-// }
-// ****************************************
-// Our search, so far ❤️
 function getPlaces(request, response) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
   superagent.get(url)
@@ -184,12 +163,6 @@ function getPlaces(request, response) {
     .catch(err => handleError(err, response));
 }
 
-
-//----Richard's code starts here--------------------
-
-// Add search result details to a temp table in the database to be read for 1) selecting a result at random to display on the page and 2) to save the random result to the restaurant (history) table.
-
-
 function saveResults(request, response) {
 
   let { name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours } = request.body;
@@ -203,8 +176,6 @@ function saveResults(request, response) {
     .catch(err => handleError(err, response));
 }
 
-// Add a shop (restaurant) to restaurants table when it gets "randomly" selected from the temp table of search results.
-// If both saveResults and addShop functions are used, refactor to use same SQL code, time permitting.
 
 function addShop(request, response) {
 
@@ -219,22 +190,6 @@ function addShop(request, response) {
     .catch(err => handleError(err, response));
 
 }
-
-// Select a random restaurant to 1) display on the page and 2) save to history/favorites
-
-// function showFavs(request, response) {
-//   const SQL = `SELECT * FROM restaurants;`;
-
-//   return client.query(SQL)
-//     .then(shopHistory => {
-//       console.log('shopHistory', shopHistory);
-//       response.render('pages/history', {
-//         historyOfRestaurants: shopHistory.rows,
-//         numberOfRestaurants: shopHistory.rowCount
-//       })
-//     })
-//     .catch(err => handleError(err, response));
-// }
 
 function showFavs(request, response) {
   let SQL = 'SELECT * FROM restaurants;';
@@ -251,7 +206,14 @@ function showFavs(request, response) {
     .catch(err => handleError(err, response));
 }
 
-// -------Richard's code ends here-------------------
+function deleteFavs (request, response) {
+  const SQL = 'DELETE FROM restaurants WHERE id=$1;';
+  const value = [request.params.id];
+  console.log(value[0]);
+  client.query(SQL, value)
+    .then(response.redirect('/pages/history.ejs'))
+    .catch(error => handleError(error, response));
+}
 
 // geocode constructor
 function Location(query, res) {
@@ -260,10 +222,10 @@ function Location(query, res) {
   this.latitude = res.body.results[0].geometry.location.lat;
   this.longitude = res.body.results[0].geometry.location.lng;
 }
+
 // placemaker
 function Place(nearby) {
   this.place_id = nearby.place_id;
-
 }
 
 // details
@@ -281,19 +243,9 @@ function Details(placeid) {
   this.hours = placeid.opening_hours.weekday_text;
 }
 
-
 app.get('*', (request, response) => response.status(404).send('Nothing to see here...'));
-
-// Error Handler
-// function handleError(err, response) {
-//   console.error(err);
-//   if (response) response.status(500).send('Sorry something went wrong');
-// }
 
 function handleError(error, response) {
   console.log(error);
   response.render('error', { error: error });
 }
-
-// Shuffle an array javascript
-// function shuffle ( array ) { array . sort ( ( ) => Math . random ( ) - 0.5 ) ; } let arr = [ 1 , 2 , 3 ] ; shuffle ( arr ) ; alert ( arr ) ; That somewhat works, because Math.random() - 0.5 is a random number that may be positive or negative, so the sorting function reorders elements randomly.
