@@ -28,6 +28,16 @@ app.listen(PORT, () => console.log(`Loud and clear on ${PORT}`));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+// Method override
+
+app.use(method(function (request) {
+  if (request.body && typeof request.body === 'object' && '_method' in request.body) {
+    let method = request.body._method;
+    delete request.body._method;
+    return method;
+  }
+}));
+
 // ejs!
 app.set('view engine', 'ejs');
 //look into app.set view options
@@ -47,7 +57,7 @@ app.post('/add-to-database', addShop);
 app.post('/add-to-results', saveResults);
 
 // app.post('/create-search', searchGeocode);
-// app.post('/shop-favorites', showFavs);
+app.get('/pages/history.ejs', showFavs);
 // app.post('/shop-details/:shop_id', showShopDetails);
 // app.post('/show-shop', showShop);
 
@@ -140,17 +150,22 @@ function aboutUs(request, response) {
 function howTo(request, response) {
   response.render('pages/how-to');
 }
+
+// function history(request,response) {
+//   response.render('pages/history');
+// }
 // ****************************************
 // Our search, so far ❤️
 function getPlaces(request, response) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
   superagent.get(url)
     .then(result => {
-      let tempArr=[];
       const location = new Location(request.body, result);
+
       const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=500&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
+
       superagent.get(nearbyurl)
-        .then(result => {
+        .then(result => { 
           const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
           Place.prototype.toString = function placeString(){return '' + this.place_id;};
           let arr=[];
@@ -160,19 +175,11 @@ function getPlaces(request, response) {
             superagent.get(detailurl)
             .then(result => {
               const placeDetails= new Details(result.body.result);
-
-              // the result is an object, you can't map. we need to use an object method here, whoops!
-              // const placeDetails = result.body.result.map(placeid => new Details(placeid));
-              // console.log('details!🦑',placeDetails);
               arr.push(placeDetails);
-              console.log(arr,'arr🦑');
-              tempArr.push(arr);
-              console.log(tempArr[1],'🙈')
               response.render('pages/show-results.ejs', { searchResults: arr });
             })
           });
         })
-        // .then(console.log(tempArr,'🙈'))
     })
     .catch(err => handleError(err, response));
 }
@@ -208,22 +215,41 @@ function addShop(request, response) {
   let values = [name, place_id, price, rating, photo_ref, photo, website, formatted_address, quick_address, formatted_phone_number, hours];
 
   return client.query(SQL, values)
-    .then(result => response.redirect('/add-to-database'))
+    .then(response.render('pages/index'))
     .catch(err => handleError(err, response));
 
 }
 
 // Select a random restaurant to 1) display on the page and 2) save to history/favorites
 
-// function showShop(request, response) {
-//     .then(shelves => {
-//       let SQL = 'SELECT * FROM temp WHERE id=$1;';
-//       let values = [request.params.id];
-//       client.query(SQL, values)
-//         .then(result => response.render('show-shop', { temp: place_id,  }))
-//         .catch(err => handleError(err, response));
+// function showFavs(request, response) {
+//   const SQL = `SELECT * FROM restaurants;`;
+
+//   return client.query(SQL)
+//     .then(shopHistory => {
+//       console.log('shopHistory', shopHistory);
+//       response.render('pages/history', {
+//         historyOfRestaurants: shopHistory.rows,
+//         numberOfRestaurants: shopHistory.rowCount
+//       })
 //     })
+//     .catch(err => handleError(err, response));
 // }
+
+function showFavs(request, response) {
+  let SQL = 'SELECT * FROM restaurants;';
+
+  return client.query(SQL)
+    .then(results => {
+      console.log(results.rows);
+      if (results.rows.rowCount === 0) {
+        response.render('pages/index');
+      } else {
+        response.render('pages/history', { results: results.rows})
+      }
+    })
+    .catch(err => handleError(err, response));
+}
 
 // -------Richard's code ends here-------------------
 
