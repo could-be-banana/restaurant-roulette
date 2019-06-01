@@ -160,9 +160,10 @@ function getPlaces(request, response) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
   superagent.get(url)
     .then(result => {
-      let tempArr=[];
       const location = new Location(request.body, result);
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=1600&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
+
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=500&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
+
       superagent.get(nearbyurl)
         .then(result => { 
           const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
@@ -174,19 +175,11 @@ function getPlaces(request, response) {
             superagent.get(detailurl)
             .then(result => {
               const placeDetails= new Details(result.body.result);
-
-              // the result is an object, you can't map. we need to use an object method here, whoops!
-              // const placeDetails = result.body.result.map(placeid => new Details(placeid));
-              // console.log('details!🦑',placeDetails);
               arr.push(placeDetails);
-              console.log(arr,'arr🦑');
-              tempArr.push(arr);
-              console.log(tempArr[1],'🙈')
               response.render('pages/show-results.ejs', { searchResults: arr });
             })
           });
         })
-        // .then(console.log(tempArr,'🙈'))
     })
     .catch(err => handleError(err, response));
 }
