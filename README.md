@@ -73,7 +73,7 @@ We wanted to create a solution for all those times you’ve been with your partn
 
 * Frameworks: Ajax, Javascript, and heroku
 
-* Packages: express, superagent, pg, and method-override
+* Packages: express, superagent, ejs, pg, and method-override
 
 
 ## User Instructions
@@ -102,6 +102,7 @@ required paramters:  key, address or components
 ####Nearby Search
 https://maps.googleapis.com/maps/api/place/nearbysearch/output?parameters
 required parameters:  key, location, radius
+
 ####Place Details
 https://maps.googleapis.com/maps/api/place/details/output?parameters
 required parameters:  key, placeid
