@@ -17,7 +17,7 @@ CREATE TABLE restaurants (
   photo_ref VARCHAR(500),
   photo VARCHAR(1000),
   website VARCHAR(255),
-  formatted_address VARCHAR(255),
+  formatted_address VARCHAR(10000),
   quick_address VARCHAR(255),
   formatted_phone_number VARCHAR(255),
   hours VARCHAR(400)
