@@ -140,7 +140,6 @@ function getPlaces(request, response) {
   superagent.get(url)
   .then(result => {
     const location = new Location(result.body, result);
-
       const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=3000&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
       
       superagent.get(nearbyurl)
