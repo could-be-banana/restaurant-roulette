@@ -95,19 +95,19 @@ If you really like the result, You can check it out in your saved history and pr
 
 The application uses four Google API endpoints:
 
-####Geocoding
+#### Geocoding
 https://maps.googleapis.com/maps/api/geocode/outputFormat?parameters
 required paramters:  key, address or components
 
-####Nearby Search
+#### Nearby Search
 https://maps.googleapis.com/maps/api/place/nearbysearch/output?parameters
 required parameters:  key, location, radius
 
-####Place Details
+#### Place Details
 https://maps.googleapis.com/maps/api/place/details/output?parameters
 required parameters:  key, placeid
 
-####Place Photos
+#### Place Photos
 https://maps.googleapis.com/maps/api/place/photo?parameters
 required parameters:  key, photoreference, maxheight or maxwidth
 
@@ -145,3 +145,16 @@ We will signal attention by raising a hand if someone needs to speak or interrup
 Until Monday evening, we will come in and work regularly scheduled hours on campus, to get to MVP. If we have not reached MVP by Monday evening, we will extend our working hours that we will outline during our standup at that time.
 
 For help on features for which someone else is better versed in we will utlize the kanba-email, but also slack them right away!
+
+## Credit Where Credit Is Due
+
+Thank you to font-awesome for the hamburger menu icon which we grabbed from their free gallery, [here](https://fontawesome.com/icons?d=gallery&m=free).
+
+Thank you for w3 schools for this neat tutorial we adapted for our menu as well: [How-To: Responsive Navbar with Dropdown](https://www.w3schools.com/howto/howto_js_responsive_navbar_dropdown.asp).
+
+And we couldn't have done flexbox as quickly without referring to [this handy guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) from CSS tricks.
+
+We utilized the reset css format from [meyerweb.com](https://meyerweb.com/eric/tools/css/reset/).
+
+Last but not least, burrito-cat is none other than the world famous Pusheen, who is a creation of Claire Belton. You can learn more about this fun kitty at [Pusheen.com](https://pusheen.com/).
+
