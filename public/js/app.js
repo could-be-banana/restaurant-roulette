@@ -19,4 +19,4 @@ $spin.on('click', function () {
 });
 
 let $searchbtn = $('#roulette');
-$searchbtn[0].submit(); //
+$searchbtn.submit(); //

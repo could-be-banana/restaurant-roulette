@@ -138,13 +138,14 @@ function howTo(request, response) {
 function getPlaces(request, response) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.body.placenearby}&key=${process.env.GOOGLE_API_KEY}`;
   superagent.get(url)
-    .then(result => {
-      const location = new Location(request.body, result);
+  .then(result => {
+    const location = new Location(result.body, result);
 
-      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=500&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
-
+      const nearbyurl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude}, ${location.longitude}&radius=3000&type=restaurant&keyword=restaurant&maxprice=${request.body.budget}&key=${process.env.GOOGLE_API_KEY}`
+      
       superagent.get(nearbyurl)
         .then(result => { 
+          console.log(result.body);
           const nearbyPlaces = result.body.results.map(nearby => new Place(nearby));
           Place.prototype.toString = function placeString(){return '' + this.place_id;};
           let arr=[];
@@ -196,7 +197,6 @@ function showFavs(request, response) {
 
   return client.query(SQL)
     .then(results => {
-      console.log(results.rows);
       if (results.rows.rowCount === 0) {
         response.render('pages/index');
       } else {
@@ -209,7 +209,6 @@ function showFavs(request, response) {
 function deleteFavs (request, response) {
   const SQL = 'DELETE FROM restaurants WHERE id=$1;';
   const value = [request.params.id];
-  console.log(value[0]);
   client.query(SQL, value)
     .then(response.redirect('/pages/history.ejs'))
     .catch(error => handleError(error, response));
